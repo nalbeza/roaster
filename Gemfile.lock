@@ -1,0 +1,24 @@
+PATH
+  remote: .
+  specs:
+    roaster (0.0.1)
+      representable (~> 2.0.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    mini_portile (0.6.0)
+    multi_json (1.10.1)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    representable (2.0.4)
+      multi_json
+      nokogiri
+      uber (~> 0.0.7)
+    uber (0.0.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  roaster!

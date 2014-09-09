@@ -1,0 +1,2 @@
+module Roaster
+end
