@@ -1,3 +1,5 @@
+require 'representable/json'
+
 module Roaster
   module JsonApi
 
