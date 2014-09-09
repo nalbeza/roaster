@@ -1,33 +1,37 @@
-module Roaster::Adapters
-  class ActiveRecord
+module Roaster
+  module Adapters
 
-    def initialize(model_class)
-      @model_class = model_class
-    end
+    class ActiveRecord
 
-    def scope_for(target)
-      scope = @model_class.all
-      unless target.ids.empty?
-        scope = scope.where(id: target.ids)
+      def initialize(model_class)
+        @model_class = model_class
       end
-      scope
-    end
 
-    def read(query)
-      q = self.scope_for(query.target)
-      query.include.each do |i|
-        q = q.include(i)
+      def scope_for(target)
+        scope = @model_class.all
+        unless target.ids.empty?
+          scope = scope.where(id: target.ids)
+        end
+        scope
       end
-      query.filters.each_pair do |k, v|
-        q = q.where(k => v)
+
+      def read(query)
+        q = self.scope_for(query.target)
+        query.include.each do |i|
+          q = q.include(i)
+        end
+        query.filters.each_pair do |k, v|
+          q = q.where(k => v)
+        end
+        sort_q = query.sorting.map do |key, order|
+          q = q.order(key => order)
+        end
+        Rails.logger.debug '===================== FINAL QUERY: ====================='
+        Rails.logger.debug q.to_sql
+        Rails.logger.debug '========================================================'
+        q
       end
-      sort_q = query.sorting.map do |key, order|
-        q = q.order(key => order)
-      end
-      Rails.logger.debug '===================== FINAL QUERY: ====================='
-      Rails.logger.debug q.to_sql
-      Rails.logger.debug '========================================================'
-      q
+
     end
 
   end
