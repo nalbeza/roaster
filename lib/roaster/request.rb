@@ -14,9 +14,10 @@ module Roaster
       @query = query
     end
 
+    #GET /albums/42
     def execute
       res = @db_adapter.send(@operation, @query)
-      BlogPostCategoryMeal.for_collection.prepare(res)
+      @mapping_class.for_collection.prepare(res)
     end
 
   end

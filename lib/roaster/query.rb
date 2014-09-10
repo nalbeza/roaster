@@ -16,7 +16,7 @@ module Roaster
     end
 
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
-    attr_accessor :page, :page_size, :include, :filters, :mapping,
+    attr_accessor :page, :page_size, :include, :filters,
                   :include_links,
                   :sorting,
                   :target
@@ -24,7 +24,7 @@ module Roaster
     #TODO: Move in config class
     DEFAULT_PAGE_SIZE = 10
 
-    def initialize(mapping, target, params = {})
+    def initialize(target, mapping, params = {})
       params.symbolize_keys! if params.respond_to?(:symbolize_keys!)
 
       @page = params[:page] ? params[:page].to_i : 1
