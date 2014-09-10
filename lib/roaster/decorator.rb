@@ -1,6 +1,13 @@
+require 'representable/decorator'
+
+require 'roaster/json_api'
+
 module Roaster
 
   class Decorator < Representable::Decorator
+
+    include Representable::JSON
+    #extend Roaster::JsonApi
 
     representable_attrs[:_filterable_attributes] ||= []
     representable_attrs[:_includeable_attributes] ||= []

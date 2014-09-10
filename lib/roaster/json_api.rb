@@ -3,7 +3,7 @@ require 'representable/json'
 module Roaster
   module JsonApi
 
-    include Representable::JSON
+    extend Representable::JSON
 
   end
 end

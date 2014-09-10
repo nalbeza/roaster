@@ -26,9 +26,9 @@ module Roaster
         sort_q = query.sorting.map do |key, order|
           q = q.order(key => order)
         end
-        Rails.logger.debug '===================== FINAL QUERY: ====================='
-        Rails.logger.debug q.to_sql
-        Rails.logger.debug '========================================================'
+        puts '===================== FINAL QUERY: ====================='
+        puts q.to_sql
+        puts '========================================================'
         q
       end
 

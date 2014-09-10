@@ -21,11 +21,14 @@ module Roaster
                   :sorting,
                   :target
 
+    #TODO: Move in config class
+    DEFAULT_PAGE_SIZE = 10
+
     def initialize(mapping, target, params = {})
       params.symbolize_keys! if params.respond_to?(:symbolize_keys!)
 
       @page = params[:page] ? params[:page].to_i : 1
-      @page_size = params[:page_size] ? params[:page_size].to_i : RestPack::Serializer.config.page_size
+      @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
       @include = includes_from_params(params, mapping)
       @filters = filters_from_params(params, mapping)
       @sorting = sorting_from_params(params, mapping)
@@ -36,7 +39,7 @@ module Roaster
     end
 
     def default_page_size?
-      @page_size == RestPack::Serializer.config.page_size
+      @page_size == DEFAULT_PAGE_SIZE
     end
 
     def filters_as_url_params
