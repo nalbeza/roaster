@@ -1,0 +1,105 @@
+WOOT:
+  - How to handle this case (different relationship resource type/name (author != people)):
+  POST /articles/1/links/author
+  {
+    "people": "12"
+  }
+  => Resource type and name are two different things !
+
+  - How to handle HABTM vs regular to_many ?
+
+WARNING: Ruby code for illustration purposes, NOT CORRECTNESS
+
+CREATE RESOURCE:
+  POST /albums
+  {
+    albums: {
+      title: "Animals"
+    }
+  }
+  Album.new(title: 'Animals').save!
+  INSERT INTO `albums` (`title`) VALUES ('Animals');
+
+DELETE RESOURCE:
+  DELETE /albums/1
+  album = Album.find(1)
+  album.destroy
+  DELETE FROM `album` WHERE `album`.`id` = 1
+
+GET TO_ONE RELATIONSHIP:
+  GET /albums/1/links/band
+  album = Album.find(1)
+  album.band
+  SELECT `albums`.* FROM `albums`  WHERE `albums`.`id` = 1 LIMIT 1;
+  SELECT `bands`.* FROM `bands`  WHERE `bands`.`id` = #{album.band_id} LIMIT 1;
+
+ADD/REPLACE TO_ONE RELATIONSHIP:
+  POST /albums/1/links/band
+  {
+    bands: "2"
+  }
+  album = Album.find(1)
+  album.band = Band.find(2)
+  UPDATE `albums` SET `band_id` = 2 WHERE `albums`.`id` = 1
+
+REPLACE TO_ONE RELATIONSHIP (equivalent to ADD/REPLACE above):
+  PUT /albums/1
+  {
+    "articles": {
+      "can_update_other_properties_too": true,
+      "links": {
+        "band": "42"
+      }
+    }
+  }
+  album = Album.find(1)
+  album.update_attributes(attr)
+  album.band = Band.find(42)
+  UPDATE `albums` SET `attr` = attr WHERE `albums`.`id` = 1
+  UPDATE `albums` SET `band_id` = 42 WHERE `albums`.`id` = 1
+
+DELETE TO_ONE RELATIONSHIP:
+  DELETE /albums/1/links/band
+  album = Album.find(1)
+  album.band = nil (.clear instead ?)
+  UPDATE `albums` SET `band_id` = NULL WHERE `albums`.`id` = 1
+
+GET TO_MANY RELATIONSHIP:
+  GET /albums/1/links/tracks
+  album = Album.find(1)
+  album.tracks
+  SELECT `tracks`.* FROM `tracks`  WHERE `tracks`.`album_id` = 1;
+
+ADD TO_MANY RELATIONSHIPS:
+  POST /album/1/links/tracks
+  {
+    tracks: ['1', '2']
+  }
+  album = Album.find(1)
+  album.tracks << tracks
+  UPDATE `tracks` SET `album_id` = 1 WHERE `tracks`.`id` = 1
+  UPDATE `tracks` SET `album_id` = 1 WHERE `tracks`.`id` = 2
+
+REPLACE TO_MANY RELATIONSHIP (equivalent to ADD/REPLACE above):
+  PUT /albums/1
+  {
+    "articles": {
+      "can_update_other_properties_too": true,
+      "links": {
+        // This can be an empty array (remove all)
+        "tracks": ["3", "5"]
+      }
+    }
+  }
+  album = Album.find(1)
+  album.update_attributes(attr)
+  album.tracks = tracks
+  UPDATE `tracks` SET `tracks`.`album_id` = NULL WHERE `tracks`.`album_id` = 1 AND `tracks`.`id` IN (#{previous_track_ids})
+  UPDATE `tracks` SET `album_id` = 1 WHERE `tracks`.`id` = 3
+  UPDATE `tracks` SET `album_id` = 1 WHERE `tracks`.`id` = 5 
+
+DELETE TO_MANY RELATIONSHIPS:
+  DELETE /albums/1/links/tracks/3,4
+  album = Album.find(1)
+  album.tracks.where(id: [3, 4]).destroy_all
+  UPDATE `blog_post_pictures` SET `blog_post_pictures`.`post_id` = NULL WHERE `blog_post_pictures`.`id` IN (3, 4)

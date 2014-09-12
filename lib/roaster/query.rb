@@ -2,22 +2,25 @@ module Roaster
   class Query
 
     #TODO: Find something better to do that
-    #TODO: Move target name in here maybe ? (and init db adapter with this) =)
     class Target
 
-      attr_accessor :ids, :relationship_name, :relationship_ids
+      attr_accessor :resource_name, :resource_ids, :relationship_name, :relationship_ids
 
-      def initialize(ids = [], relationship_name = nil, relationship_ids = [])
-        @ids = ids
+      #TODO: Distinguish none and all !
+      def initialize(resource_name,
+                     resource_ids = [],
+                     relationship_name = nil,
+                     relationship_ids = [])
+        @resource_name = resource_name
+        @resource_ids = Array(resource_ids)
         @relationship_name = relationship_name
-        @relationship_ids = relationship_ids
+        @relationship_ids = Array(relationship_ids)
       end
 
     end
 
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
-    attr_accessor :page, :page_size, :include, :filters,
-                  :include_links,
+    attr_accessor :page, :page_size, :includes, :filters,
                   :sorting,
                   :target
 
@@ -29,13 +32,12 @@ module Roaster
 
       @page = params[:page] ? params[:page].to_i : 1
       @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
-      @include = includes_from_params(params, mapping)
+      @includes = includes_from_params(params, mapping)
       @filters = filters_from_params(params, mapping)
       @sorting = sorting_from_params(params, mapping)
       #VALIDATE THIS (TARGET) ! omgz =D
       @mapping = mapping
       @target = target
-      @include_links = true
     end
 
     def default_page_size?
@@ -64,22 +66,20 @@ module Roaster
     def filters_from_params(params, mapping)
       filters = {}
       mapping.filterable_attributes.each do |filter|
-        [filter, "#{filter}s".to_sym].each do |key|
-          filters[filter] = params[key].to_s.split(',') if params[key]
-        end
+        filters[filter] = params[filter] if params[filter]
       end
       filters
     end
 
     def sorting_from_params(params, mapping)
-      sort_values = params[:sort] && params[:sort].split(',')
-      return {} if sort_values.blank? || mapping.serializable_sorting_attributes.blank?
+      sort_values = params[:sort] && params[:sort].to_s.split(',')
+      return {} if sort_values.blank? || mapping.sortable_attributes.blank?
       sorting_parameters = {}
 
       sort_values.each do |sort_value|
         sort_order = sort_value[0] == '-' ? :desc : :asc
         sort_value = sort_value.gsub(/\A\-/, '').downcase.to_sym
-        sorting_parameters[sort_value] = sort_order if mapping.serializable_sorting_attributes.include?(sort_value)
+        sorting_parameters[sort_value] = sort_order if mapping.sortable_attributes.include?(sort_value)
       end
       sorting_parameters
     end
