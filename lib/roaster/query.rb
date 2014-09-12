@@ -1,12 +1,13 @@
 module Roaster
+
+  # Query represents the operation performed on the target, and its parameters 
   class Query
 
-    #TODO: Find something better to do that
+    # Target represents the resource(s) scope on which is executed the query
     class Target
 
       attr_accessor :resource_name, :resource_ids, :relationship_name, :relationship_ids
 
-      #TODO: Distinguish none and all !
       def initialize(resource_name,
                      resource_ids = [],
                      relationship_name = nil,
@@ -22,14 +23,17 @@ module Roaster
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
     attr_accessor :page, :page_size, :includes, :filters,
                   :sorting,
-                  :target
+                  :operation
 
     #TODO: Move in config class
     DEFAULT_PAGE_SIZE = 10
+    OPERATIONS = [:create, :read, :update, :delete]
 
-    def initialize(target, mapping, params = {})
+    def initialize(operation, mapping, params = {})
+      raise "Invalid operation: #{operation}" unless OPERATIONS.include?(operation)
       params.symbolize_keys! if params.respond_to?(:symbolize_keys!)
 
+      @operation = operation
       @page = params[:page] ? params[:page].to_i : 1
       @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
       @includes = includes_from_params(params, mapping)
@@ -37,7 +41,6 @@ module Roaster
       @sorting = sorting_from_params(params, mapping)
       #VALIDATE THIS (TARGET) ! omgz =D
       @mapping = mapping
-      @target = target
     end
 
     def default_page_size?

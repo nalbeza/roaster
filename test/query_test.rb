@@ -4,7 +4,7 @@ require 'roaster/query'
 
 require_relative 'test_helper'
 
-class QueryTest < MiniTest::Unit::TestCase
+class QueryTest < MiniTest::Test
 
   def setup
     super
@@ -13,8 +13,7 @@ class QueryTest < MiniTest::Unit::TestCase
   end
 
   def test_page_defaults
-    q = Roaster::Query.new(@target, @mapping)
-    assert_equal @target, q.target
+    q = Roaster::Query.new(:read, @mapping)
     assert_equal 1, q.page
     assert_equal Roaster::Query::DEFAULT_PAGE_SIZE, q.page_size
     assert_equal [], q.includes
@@ -56,7 +55,7 @@ class QueryTest < MiniTest::Unit::TestCase
   private
 
   def build_query(params)
-    Roaster::Query.new(@target, @mapping, params)
+    Roaster::Query.new(:read, @mapping, params)
   end
 
 end

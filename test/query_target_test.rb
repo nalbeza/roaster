@@ -4,7 +4,7 @@ require 'roaster/query'
 
 require_relative 'test_helper'
 
-class QueryTargetTest < MiniTest::Unit::TestCase
+class QueryTargetTest < MiniTest::Test
 
   def setup
     super

@@ -7,7 +7,7 @@ require_relative 'test_helper'
 require_relative 'models/album'
 #require_relative 'models/namespaced/model'
 
-class ActiveRecordAdapterTest < MiniTest::Unit::TestCase
+class ActiveRecordAdapterTest < MiniTest::Test
 
   def setup
     super

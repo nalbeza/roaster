@@ -33,7 +33,7 @@ GET TO_ONE RELATIONSHIP:
   SELECT `albums`.* FROM `albums`  WHERE `albums`.`id` = 1 LIMIT 1;
   SELECT `bands`.* FROM `bands`  WHERE `bands`.`id` = #{album.band_id} LIMIT 1;
 
-ADD/REPLACE TO_ONE RELATIONSHIP:
+CREATE/REPLACE TO_ONE RELATIONSHIP:
   POST /albums/1/links/band
   {
     bands: "2"
@@ -70,7 +70,7 @@ GET TO_MANY RELATIONSHIP:
   album.tracks
   SELECT `tracks`.* FROM `tracks`  WHERE `tracks`.`album_id` = 1;
 
-ADD TO_MANY RELATIONSHIPS:
+CREATE/ADD TO_MANY RELATIONSHIPS:
   POST /album/1/links/tracks
   {
     tracks: ['1', '2']
