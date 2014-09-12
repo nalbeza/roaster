@@ -3,6 +3,10 @@ module Roaster
 
     class ActiveRecord
 
+      def initialize(model_class)
+        @model_class = model_class
+      end
+
       def create(query)
       end
 
