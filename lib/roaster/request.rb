@@ -10,29 +10,33 @@ module Roaster
       end
       @operation = operation
       @resource = resource
-      @mapping_class = opts[:mapping_class] || mapping_class_from_target(@resource.target)
+      @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(@resource.target)
       @query = Roaster::Query.new(@operation, @mapping_class, params)
       @input_resource = opts[:input_resource]
     end
 
     def execute
-      res = @resource.send(@operation, @query)
+      #res = @resource.send(@operation, @query)
       case @operation
       when :create
-        obj = @resource.new_instance
+        obj = @resource.new
         @mapping_class.represent(obj).from_hash(@input_resource)
         obj.save!
         obj
       when :read
-        res = @resource.query(query)
+        res = @resource.query(@query)
+        puts
+        puts 'RES'
+        ap res
+        puts '=============='
         @mapping_class.represent(res).to_hash
       when :update
-        obj = @resource.find_instance
+        obj = @resource.find
         @mapping_class.represent(obj).from_hash(@input_resource)
         obj.save!
         obj
       when :delete
-        @resource.delete_instance
+        @resource.delete
       end
     end
 

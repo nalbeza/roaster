@@ -12,7 +12,7 @@ class PoniesTest < MiniTest::Test
     params = {}
     target = Roaster::Query::Target.new(:albums)
     resource = Roaster::Resource.new(target,
-                                     adapter_class: Roaster::Adapters::ActiveRecord)
+                                     Roaster::Adapters::ActiveRecord)
                                      #model_class: ::Blog::Category
     rq = Roaster::Request.new(:read,
                               resource,
