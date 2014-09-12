@@ -3,8 +3,8 @@ require File.expand_path('../lib/roaster/version', __FILE__)
  
 Gem::Specification.new do |gem|
   gem.name          = 'roaster'
-  gem.authors       = ['Nicolas Albeza']
-  gem.email         = ['n.albeza@gmail.com']
+  gem.authors       = ['Nicolas Albeza', 'Jérémy Lecerf']
+  gem.email         = ['n.albeza@gmail.com', 'redpist.com@gmail.com']
   gem.description   = %q{Model/JSONAPI mapping}
   gem.summary       = %q{Expose your models through a JSONAPI API with a simple mapping}
   gem.homepage      = 'https://github.com/pause/roaster'
