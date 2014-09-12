@@ -15,9 +15,6 @@ module Roaster
     end
 
     #TODO: Move this elsewhere (factory)
-    def self.model_class_from_target(target)
-      "#{target.resource_name.to_s.singularize}".classify.constantize
-    end
 
   end
 

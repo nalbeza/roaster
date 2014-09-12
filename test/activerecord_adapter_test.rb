@@ -11,7 +11,7 @@ class ActiveRecordAdapterTest < MiniTest::Test
 
   def setup
     super
-    @adapter = Roaster::Adapters::ActiveRecord.new
+    @adapter = Roaster::Adapters::ActiveRecord.new(:albums)
     @mapping = AlbumMapping
   end
 
@@ -21,6 +21,12 @@ class ActiveRecordAdapterTest < MiniTest::Test
     assert @adapter.respond_to?(:update)
     assert @adapter.respond_to?(:delete)
   end
+
+  def test_mapping_class_from_resource_name
+    mc = Roaster::Adapters::ActiveRecord.model_class_from_resource_name(:albums)
+    assert_equal Album, mc
+  end
+
 =begin
   def test_simple_model_for_resource
     model = @adapter.send(:model_for, :albums)

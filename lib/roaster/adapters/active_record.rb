@@ -1,10 +1,20 @@
+require 'active_record'
+
 module Roaster
   module Adapters
 
     class ActiveRecord
 
       def initialize(model_class)
-        @model_class = model_class
+        if model_class.kind_of?(::ActiveRecord::Base)
+          @model_class = model_class
+        else
+          @model_class = self.class.model_class_from_resource_name(model_class)
+        end
+      end
+
+      def self.model_class_from_resource_name(resource_name)
+        "#{resource_name.to_s.singularize}".classify.constantize
       end
 
       def create(query)
