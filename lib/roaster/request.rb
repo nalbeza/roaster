@@ -10,7 +10,7 @@ module Roaster
       end
       @operation = operation
       @resource = resource
-      @mapping_class = opts[:mapping_class] || self.mapping_class_from_target(@resource.target)
+      @mapping_class = opts[:mapping_class] || mapping_class_from_target(@resource.target)
       @query = Roaster::Query.new(@operation, @mapping_class, params)
       @input_resource = opts[:input_resource]
     end
@@ -36,9 +36,9 @@ module Roaster
       end
     end
 
-    private
-
-    def mapping_class_from_target(target)
+    #TODO: Move this elsewhere (factory)
+    def self.mapping_class_from_target(target)
+      "#{target.resource_name.to_s.singularize}_mapping".classify.constantize
     end
 
   end

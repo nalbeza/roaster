@@ -6,7 +6,7 @@ require 'roaster/request'
 
 require_relative 'test_helper'
 
-class QueryTest < MiniTest::Test
+class PoniesTest < MiniTest::Test
 
   def test_ponies
     params = {}

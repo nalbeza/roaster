@@ -3,6 +3,7 @@ PATH
   specs:
     roaster (0.0.1)
       activerecord (~> 4.1.0)
+      activesupport (~> 4.1.0)
       representable (~> 2.0.0)
 
 GEM
