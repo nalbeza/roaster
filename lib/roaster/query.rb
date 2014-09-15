@@ -22,6 +22,7 @@ module Roaster
 
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
     attr_accessor :page, :page_size, :includes, :filters,
+                  :target,
                   :sorting,
                   :operation
 
@@ -29,11 +30,12 @@ module Roaster
     DEFAULT_PAGE_SIZE = 10
     OPERATIONS = [:create, :read, :update, :delete]
 
-    def initialize(operation, mapping, params = {})
+    def initialize(operation, target, mapping, params = {})
       raise "Invalid operation: #{operation}" unless OPERATIONS.include?(operation)
       params.symbolize_keys! if params.respond_to?(:symbolize_keys!)
 
       @operation = operation
+      @target = target
       @page = params[:page] ? params[:page].to_i : 1
       @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
       @includes = includes_from_params(params, mapping)

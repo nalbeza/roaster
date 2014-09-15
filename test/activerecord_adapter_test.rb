@@ -11,8 +11,9 @@ class ActiveRecordAdapterTest < MiniTest::Test
 
   def setup
     super
-    @adapter = Roaster::Adapters::ActiveRecord.new(:albums)
-    @mapping = AlbumMapping
+    @adapter = Roaster::Adapters::ActiveRecord.new
+    @album_mapping = AlbumMapping
+    @albums_target = Roaster::Query::Target.new(:albums)
   end
 
   def test_interface
@@ -41,6 +42,54 @@ class ActiveRecordAdapterTest < MiniTest::Test
   end
 =end
 
+
+
+  def test_new
+    query = build_query(:create)
+    model_instance = @adapter.new(query)
+    assert_kind_of Album, model_instance
+  end
+
+  def test_save
+    title = 'Serial Smokers'
+    query = build_query(:create)
+    model_instance = @adapter.new(query)
+    model_instance.send(:title=, title)
+    @adapter.save(model_instance)
+
+    new_album = Album.last
+    assert_equal model_instance, new_album
+    assert_equal title, new_album.title
+    # band: 'Hugo Matha and The Crackheads'
+    # {title: 'Serial Smokers'}
+  end
+
+=begin
+  def test_read
+    q = call_adapter_method :read
+  end
+
+  def test_update
+    q = call_adapter_method :update
+  end
+
+  def test_delete
+    q = call_adapter_method :delete
+  end
+=end
+
+  private
+
+  def call_adapter_method(method,
+                          target,
+                          params = {})
+    query = Roaster::Query.new(method, target, @mapping, params)
+    @adapter.send(method, query)
+  end
+
+  def build_query(operation, target = @albums_target, mapping = @album_mapping, params = {})
+    Roaster::Query.new(:create, @albums_target, @album_mapping, params)
+  end
 =begin
   /:resource
     - :create resource  
@@ -97,32 +146,5 @@ class ActiveRecordAdapterTest < MiniTest::Test
     scope = @adapter.send(:scope_for, target)
     assert_equal scope, Album.where(id: [1, 2, 3])
   end
-
-  def test_create
-    q = call_adapter_method :create
-    assert q.to_sql == 'toto'
-  end
-
-  def test_read
-    q = call_adapter_method :read
-  end
-
-  def test_update
-    q = call_adapter_method :update
-  end
-
-  def test_delete
-    q = call_adapter_method :delete
-  end
-
-  private
-
-  def call_adapter_method(method,
-                          target = Roaster::Query::Target.new,
-                          params = {})
-    query = Roaster::Query.new(target, @mapping, params)
-    @adapter.send(method, query)
-  end
 =end
-
 end

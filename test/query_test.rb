@@ -13,7 +13,7 @@ class QueryTest < MiniTest::Test
   end
 
   def test_page_defaults
-    q = Roaster::Query.new(:read, @mapping)
+    q = build_query()
     assert_equal 1, q.page
     assert_equal Roaster::Query::DEFAULT_PAGE_SIZE, q.page_size
     assert_equal [], q.includes
@@ -32,8 +32,8 @@ class QueryTest < MiniTest::Test
   end
 
   def test_simple_sorting
-    q = build_query({ sort: '-band,tracks' })
-    assert_equal Hash.new(band: :desc, tracks: :asc), q.sorting
+    q = build_query({ sort: '-title,created_at' })
+    assert_equal({title: :desc, created_at: :asc}, q.sorting)
   end
 
   def test_nested_sorting
@@ -54,8 +54,8 @@ class QueryTest < MiniTest::Test
 
   private
 
-  def build_query(params)
-    Roaster::Query.new(:read, @mapping, params)
+  def build_query(params = {})
+    Roaster::Query.new(:read, @target, @mapping, params)
   end
 
 end

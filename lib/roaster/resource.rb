@@ -4,14 +4,24 @@ module Roaster
     
     attr_reader :target
 
-    def initialize(target, adapter_class, opts = {})
-      @target = target
-      model_class = opts[:model_class] || self.class.model_class_from_target(target)
-      @adapter = adapter_class.new(model_class)
+    def initialize(adapter_class, opts = {})
+      @adapter = adapter_class.new
+      @model_class = opts[:model_class]
+    end
+
+    def new(query)
+      @adapter.new(query)
+    end
+
+    def save(model)
+      @adapter.save(model)
     end
 
     def query(query)
-      @adapter.read(query)
+      @adapter.read(query, model_class: @model_class)
+    end
+
+    def model_class
     end
 
     #TODO: Move this elsewhere (factory)
