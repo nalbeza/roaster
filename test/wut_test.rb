@@ -15,10 +15,14 @@ class PoniesTest < MiniTest::Test
     FactoryGirl.create(:animals_album)
     FactoryGirl.create(:the_wall_album)
     FactoryGirl.create(:meddle_album)
+=begin
+ 1 - Enemy Within
+ 2 - Burning Angel
+ 3 - Heart Of Darkness
+=end
     @arch_enemy_band = FactoryGirl.create :band, name: 'Arch Enemy'
     @wages_of_sin_album = FactoryGirl.create :album, title: 'Wages of Sin', band: @arch_enemy_band
     @ar_resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
-                              #model_class: ::Blog::Category
   end
 
   def build_target(resource_name = :albums, resource_ids = nil, relationship_name = nil, relationship_ids = nil)
@@ -54,6 +58,7 @@ class PoniesTest < MiniTest::Test
   end
 
   #TODO: Make this one pass !
+  #TODO: This is an extension, document it according to JSONAPI spec !
   def test_association_filtered_ponies
     return
     params = {
@@ -65,6 +70,21 @@ class PoniesTest < MiniTest::Test
     res = rq.execute
     assert_equal 1, res.count
     assert_equal @arch_enemy_band.name, res.first.band.name
+  end
+
+  def test_read_to_one_relationship
+    target = build_target(:albums, @wages_of_sin_album, :band)
+    rq = build_request(:read, target: target)
+    res = rq.execute
+    assert_equal({'name' => 'Arch Enemy'}, res)
+  end
+
+  def test_read_to_many_relationship
+
+    target = build_target(:albums, @wages_of_sin_album, :tracks)
+    rq = build_request(:read, target: target)
+    res = rq.execute
+    assert_equal([{'name' => 'Enemy Within'}, {'name' => 'Burning Angel'}, {'name' => 'Heart of Darkness'}], res)
   end
 
   def test_create_pony

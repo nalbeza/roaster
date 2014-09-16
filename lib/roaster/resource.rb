@@ -2,8 +2,6 @@ module Roaster
 
   class Resource
     
-    attr_reader :target
-
     def initialize(adapter_class, opts = {})
       @adapter = adapter_class.new
       @model_class = opts[:model_class]
@@ -29,11 +27,6 @@ module Roaster
     def query(query)
       @adapter.read(query, model_class: @model_class)
     end
-
-    def model_class
-    end
-
-    #TODO: Move this elsewhere (factory)
 
   end
 
