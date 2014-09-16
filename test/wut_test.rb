@@ -28,7 +28,7 @@ class PoniesTest < MiniTest::Test
                               @ar_resource,
                               {})
     res = rq.execute
-    assert_equal([{"title" => "Animals"}, {"title" => "The Wall"}, {"title" => "Meddle"}], res)
+    assert_equal([{'title' => 'Animals'}, {'title' => 'The Wall'}, {'title' => 'Meddle'}], res)
   end
 
   def test_sorted_ponies
@@ -38,7 +38,17 @@ class PoniesTest < MiniTest::Test
                               @ar_resource,
                               params)
     res = rq.execute
-    assert_equal([{"title" => "Animals"}, {"title" => "Meddle"}, {"title" => "The Wall"}], res)
+    assert_equal([{'title' => 'Animals'}, {'title' => 'Meddle'}, {'title' => 'The Wall'}], res)
+  end
+
+  def test_simple_filtered_ponies
+    params = {title: 'Animals'}
+    rq = Roaster::Request.new(:read,
+                              build_target,
+                              @ar_resource,
+                              params)
+    res = rq.execute
+    assert_equal([{'title' => 'Animals'}], res)
   end
 
   def test_create_pony
