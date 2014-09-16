@@ -76,17 +76,27 @@ module Roaster
       filters
     end
 
-    def sorting_from_params(params, mapping)
-      sort_values = params[:sort] && params[:sort].to_s.split(',')
-      return {} if sort_values.blank? || mapping.sortable_attributes.blank?
+    def parse_sort_criteria(criteria)
       sorting_parameters = {}
-
-      sort_values.each do |sort_value|
+      criteria.to_s.split(',').each do |sort_value|
         sort_order = sort_value[0] == '-' ? :desc : :asc
         sort_value = sort_value.gsub(/\A\-/, '').downcase.to_sym
-        sorting_parameters[sort_value] = sort_order if mapping.sortable_attributes.include?(sort_value)
+        sorting_parameters[sort_value] = sort_order
       end
       sorting_parameters
+    end
+
+    def sorting_from_params(params, mapping)
+      return {} if params[:sort].blank? || mapping.sortable_attributes.blank?
+      if params[:sort].class == Hash
+        sorting_parameters = {}
+        params[:sort].each do |sorting_resource|
+          sorting_parameters[sorting_resource[0].to_sym] = parse_sort_criteria sorting_resource[1]
+        end
+        sorting_parameters
+      else
+        parse_sort_criteria(params[:sort])
+     end
     end
 
     def map_filter_ids(key,value)

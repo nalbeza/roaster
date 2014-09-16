@@ -43,7 +43,7 @@ class AlbumMapping < Roaster::Decorator
 
   can_filter_by :band
 
-  can_sort_by :band, :title, :created_at
+  can_sort_by :band, :title, :created_at, band: [:name]
 
   collection_representer class: Album
 end

@@ -34,7 +34,14 @@ module Roaster
       #TODO: Disallow sorting directly by relationship (need relationship field)
       def can_sort_by(*attrs)
         representable_attrs[:_sortable_attributes] ||= []
-        representable_attrs[:_sortable_attributes].push(*attrs.map(&:to_sym)).uniq!
+        sort_keys = attrs.map do |option|
+          if option.class == Hash
+            { option.first[0].to_sym => option.first[1].map(&:to_sym) }
+          else
+            option.to_sym
+          end
+        end
+        representable_attrs[:_sortable_attributes].push(*sort_keys).uniq!
       end
 
       def sortable_attributes
