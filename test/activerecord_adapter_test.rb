@@ -55,8 +55,6 @@ class ActiveRecordAdapterTest < MiniTest::Test
     new_album = Album.last
     assert_equal model_instance, new_album
     assert_equal title, new_album.title
-    # band: 'Hugo Matha and The Crackheads'
-    # {title: 'Serial Smokers'}
   end
 
   def test_find
@@ -98,8 +96,6 @@ class ActiveRecordAdapterTest < MiniTest::Test
     new_album = Album.last
     assert_equal model_instance, new_album
     assert_equal title, new_album.title
-    # band: 'Hugo Matha and The Crackheads'
-    # {title: 'Serial Smokers'}
   end
 
   def test_find
