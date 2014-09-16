@@ -2,19 +2,23 @@ require_relative './band'
 
 FactoryGirl.define do
   factory :album do
-    title "Album Title"
+    title 'Album Title'
     band
 
-    factory :animals_album do
-      title 'Animals'
-    end
+    factory :pink_floyd_albums do
+      association :band, factory: :pink_floyd
 
-    factory :the_wall_album do
-      title 'The Wall'
-    end
+      factory :animals_album do
+        title 'Animals'
+      end
 
-    factory :meddle_album do
-      title 'Meddle'
+      factory :the_wall_album do
+        title 'The Wall'
+      end
+
+      factory :meddle_album do
+        title 'Meddle'
+      end
     end
 
   end

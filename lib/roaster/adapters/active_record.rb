@@ -21,6 +21,7 @@ module Roaster
       end
 
       def find(query, model_class: nil)
+        raise 'No ID provided' if query.target.resource_ids.empty?
         scope_for(query.target, model_class).first
       end
 
