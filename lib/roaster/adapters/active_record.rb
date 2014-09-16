@@ -39,7 +39,7 @@ module Roaster
       end
 
       def delete(query)
-        q = self.scope_for(query.target)
+        q = scope_for(query.target)
         q.destroy_all
         q
       end

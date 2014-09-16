@@ -18,6 +18,10 @@ module Roaster
       model
     end
 
+    def delete(query)
+      @adapter.delete(query)
+    end
+
     def find(query)
       @adapter.find(query, model_class: @model_class)
     end

@@ -84,4 +84,18 @@ class PoniesTest < MiniTest::Test
     assert_equal 'Antichrist Superstar', res.title
   end
 
+  def test_delete_pony
+    album = FactoryGirl.create(:album)
+    album_id = album.id
+    target = Roaster::Query::Target.new(:albums, album_id)
+    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
+    rq = Roaster::Request.new(:delete,
+                              target,
+                              resource,
+                              {})
+
+    res = rq.execute
+    refute Album.exists?(album_id)
+  end
+
 end
