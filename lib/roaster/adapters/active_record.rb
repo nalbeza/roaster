@@ -20,6 +20,10 @@ module Roaster
         model.save!
       end
 
+      def find(query, model_class: nil)
+        scope_for(query.target, model_class).first
+      end
+
       def create(query, model_class: nil)
       end
 
@@ -70,7 +74,7 @@ module Roaster
         model_class = model_for(model_class_or_name || target.resource_name)
         scope = model_class.all
         unless target.resource_ids.empty?
-          scope = scope.where(id: target.ids)
+          scope = scope.where(id: target.resource_ids)
         end
         scope
       end

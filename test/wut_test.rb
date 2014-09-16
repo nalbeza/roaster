@@ -66,4 +66,22 @@ class PoniesTest < MiniTest::Test
     assert_equal 'The Downward Spiral', res.title
   end
 
+  def test_update_pony
+    album = FactoryGirl.create(:album)
+    album_update_hash = {
+      'title' => 'Antichrist Superstar'
+    }
+    target = Roaster::Query::Target.new(:albums, album.id)
+    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
+    rq = Roaster::Request.new(:update,
+                              target,
+                              resource,
+                              {},
+                              document: album_update_hash)
+
+    res = rq.execute
+    assert_equal album.id, res.id
+    assert_equal 'Antichrist Superstar', res.title
+  end
+
 end

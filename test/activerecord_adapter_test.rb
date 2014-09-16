@@ -62,6 +62,16 @@ class ActiveRecordAdapterTest < MiniTest::Test
     # {title: 'Serial Smokers'}
   end
 
+  def test_find
+    ref_album = FactoryGirl.create(:album)
+    target = Roaster::Query::Target.new(:albums, ref_album.id)
+    #TODO: API problems (why do i need a full query here ?!)!
+    query = build_query(:update, target)
+    album = @adapter.find(query)
+
+    assert_equal album, ref_album
+  end
+
 =begin
   def test_read
     q = call_adapter_method :read

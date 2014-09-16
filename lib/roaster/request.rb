@@ -31,10 +31,9 @@ module Roaster
         res = @resource.query(@query)
         represent(res).to_hash
       when :update
-        obj = @resource.find
-        @mapping_class.represent(obj).from_hash(@document)
-        obj.save!
-        obj
+        obj = @resource.find(@query)
+        parse(obj, @document)
+        @resource.save(obj)
       when :delete
         @resource.delete
       end

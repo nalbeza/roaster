@@ -18,6 +18,10 @@ module Roaster
       model
     end
 
+    def find(query)
+      @adapter.find(query, model_class: @model_class)
+    end
+
     def query(query)
       @adapter.read(query, model_class: @model_class)
     end
