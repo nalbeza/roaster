@@ -14,19 +14,17 @@ class PoniesTest < MiniTest::Test
     FactoryGirl.create(:animals_album)
     FactoryGirl.create(:the_wall_album)
     FactoryGirl.create(:meddle_album)
+    @ar_resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
+                              #model_class: ::Blog::Category
   end
 
   def test_ponies
     params = {}
     target = Roaster::Query::Target.new(:albums)
-    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
-                              #model_class: ::Blog::Category
     rq = Roaster::Request.new(:read,
                               target,
-                              resource,
+                              @ar_resource,
                               params)
-                              #input_resource: nil,
-                              #mapping_class: AlbumMapping
     res = rq.execute
     assert_equal([{"title" => "Animals"}, {"title" => "The Wall"}, {"title" => "Meddle"}], res)
   end
@@ -34,14 +32,10 @@ class PoniesTest < MiniTest::Test
   def test_sorted_ponies
     params = {sort: :title}
     target = Roaster::Query::Target.new(:albums)
-    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
-                              #model_class: ::Blog::Category
     rq = Roaster::Request.new(:read,
                               target,
-                              resource,
+                              @ar_resource,
                               params)
-                              #input_resource: nil,
-                              #mapping_class: AlbumMapping
     res = rq.execute
     assert_equal([{"title" => "Animals"}, {"title" => "Meddle"}, {"title" => "The Wall"}], res)
   end
@@ -49,17 +43,14 @@ class PoniesTest < MiniTest::Test
   def test_create_pony
     params = {}
     target = Roaster::Query::Target.new(:albums)
-    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
     album_hash = {
       'title' => 'The Downward Spiral'
     }
     rq = Roaster::Request.new(:create,
                               target,
-                              resource,
+                              @ar_resource,
                               params,
                               document: album_hash)
-                              #input_resource: nil,
-                              #mapping_class: AlbumMapping
 
     res = rq.execute
     refute_nil res.id
@@ -72,10 +63,9 @@ class PoniesTest < MiniTest::Test
       'title' => 'Antichrist Superstar'
     }
     target = Roaster::Query::Target.new(:albums, album.id)
-    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
     rq = Roaster::Request.new(:update,
                               target,
-                              resource,
+                              @ar_resource,
                               {},
                               document: album_update_hash)
 
@@ -88,10 +78,9 @@ class PoniesTest < MiniTest::Test
     album = FactoryGirl.create(:album)
     album_id = album.id
     target = Roaster::Query::Target.new(:albums, album_id)
-    resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
     rq = Roaster::Request.new(:delete,
                               target,
-                              resource,
+                              @ar_resource,
                               {})
 
     res = rq.execute
