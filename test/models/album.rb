@@ -41,7 +41,7 @@ class AlbumMapping < Roaster::Decorator
 
   can_include :band, :tracks
 
-  can_filter_by :band
+  can_filter_by :band, :title
 
   can_sort_by :band, :title, :created_at, band: [:name]
 

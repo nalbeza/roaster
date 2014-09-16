@@ -35,7 +35,7 @@ module Roaster
         parse(obj, @document)
         @resource.save(obj)
       when :delete
-        @resource.delete
+        @resource.delete(@query)
       end
     end
 
