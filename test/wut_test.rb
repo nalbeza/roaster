@@ -6,6 +6,8 @@ require 'roaster/request'
 
 require_relative 'test_helper'
 require_relative 'factories/album'
+require_relative 'factories/track'
+require_relative 'factories/band'
 
 class PoniesTest < MiniTest::Test
 
@@ -21,7 +23,11 @@ class PoniesTest < MiniTest::Test
  3 - Heart Of Darkness
 =end
     @arch_enemy_band = FactoryGirl.create :band, name: 'Arch Enemy'
-    @wages_of_sin_album = FactoryGirl.create :album, title: 'Wages of Sin', band: @arch_enemy_band
+    @wages_of_sin_album = FactoryGirl.create :album, title: 'Wages of Sin', band: @arch_enemy_band, tracks: [
+      FactoryGirl.create(:track, title: 'Enemy Within'),
+      FactoryGirl.create(:track, title: 'Burning Angel'),
+      FactoryGirl.create(:track, title: 'Heart Of Darkness')
+    ]
     @ar_resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
   end
 
@@ -80,11 +86,10 @@ class PoniesTest < MiniTest::Test
   end
 
   def test_read_to_many_relationship
-
     target = build_target(:albums, @wages_of_sin_album, :tracks)
     rq = build_request(:read, target: target)
     res = rq.execute
-    assert_equal([{'name' => 'Enemy Within'}, {'name' => 'Burning Angel'}, {'name' => 'Heart of Darkness'}], res)
+    assert_equal([{'title' => 'Enemy Within'}, {'title' => 'Burning Angel'}, {'title' => 'Heart Of Darkness'}], res)
   end
 
   def test_create_pony

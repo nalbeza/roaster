@@ -66,6 +66,11 @@ module Roaster
         unless target.resource_ids.empty?
           scope = scope.where(id: target.resource_ids)
         end
+        if target.relationship_name
+          raise "Cannot apply relationship #{target.relationship_name} to nil object" if scope.count == 0
+          raise "Cannot apply relationship #{target.relationship_name} to more than one object" if scope.count > 1
+          scope = scope.first.send(target.relationship_name)
+        end
         scope
       end
 

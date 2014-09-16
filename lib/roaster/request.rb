@@ -5,7 +5,15 @@ module Roaster
 
     #TODO: Move this elsewhere (factory)
     def self.mapping_class_from_target(target)
-      "#{target.resource_name.to_s.singularize}_mapping".classify.constantize
+      if target.relationship_name
+        mapping_class_from_name(target.relationship_name)
+      else
+        mapping_class_from_name(target.resource_name)
+      end
+    end
+
+    def self.mapping_class_from_name(name)
+      "#{name.to_s.singularize}_mapping".classify.constantize
     end
 
     def initialize(operation, target, resource, params, opts = {})
