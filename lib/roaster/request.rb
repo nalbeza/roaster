@@ -18,23 +18,21 @@ module Roaster
       @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       #TODO: Oh snap this is confusing
-      @input_resource = opts[:input_resource]
+      @document = opts[:document]
     end
 
     def execute
       case @operation
       when :create
         obj = @resource.new(@query)
-        byebug
-        @mapping_class.represent(obj).from_hash(@input_resource)
-        obj.save!
-        obj
+        parse(obj, @document)
+        @resource.save(obj)
       when :read
         res = @resource.query(@query)
         represent(res).to_hash
       when :update
         obj = @resource.find
-        @mapping_class.represent(obj).from_hash(@input_resource)
+        @mapping_class.represent(obj).from_hash(@document)
         obj.save!
         obj
       when :delete
@@ -43,6 +41,11 @@ module Roaster
     end
 
     private
+
+    def parse(object, data)
+      rp = @mapping_class.new(object)
+      rp.from_hash(data)
+    end
 
     def represent(data)
       if data.respond_to?(:each)

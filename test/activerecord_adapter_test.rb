@@ -42,8 +42,6 @@ class ActiveRecordAdapterTest < MiniTest::Test
   end
 =end
 
-
-
   def test_new
     query = build_query(:create)
     model_instance = @adapter.new(query)

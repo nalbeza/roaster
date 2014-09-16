@@ -15,6 +15,7 @@ module Roaster
 
     def save(model)
       @adapter.save(model)
+      model
     end
 
     def query(query)
