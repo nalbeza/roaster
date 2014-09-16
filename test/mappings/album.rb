@@ -7,6 +7,8 @@ class AlbumMapping < Roaster::Decorator
   property :title
   #property :created_at
 
+  # TODO: auto include included mapping
+  # Aiming: Nested sparse fieldsets authorizations and default behaviour for sort
   can_include :band, :tracks
 
   can_filter_by :band, :title
