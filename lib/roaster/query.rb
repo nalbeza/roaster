@@ -86,6 +86,9 @@ module Roaster
       sorting_parameters
     end
 
+    def validate_sorting_parameters(sort, mapping)
+    end
+
     def sorting_from_params(params, mapping)
       return {} if params[:sort].blank? || mapping.sortable_attributes.blank?
       if params[:sort].class == Hash
@@ -96,7 +99,7 @@ module Roaster
         sorting_parameters
       else
         parse_sort_criteria(params[:sort])
-     end
+      end
     end
 
     def map_filter_ids(key,value)

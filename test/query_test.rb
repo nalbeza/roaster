@@ -31,6 +31,28 @@ class QueryTest < MiniTest::Test
     assert_equal({band: 1}, q.filters)
   end
 
+  # TODO: Make this one pass !
+  # def test_nested_filters
+  #   q = build_query({
+  #     fields: {
+  #       band: {
+  #         name: 'Pink Floyd'
+  #       },
+  #       albums: {
+  #         title: 'Animals'
+  #       }
+  #     }
+  #   })
+  #   assert_equal({
+  #     band: {
+  #       name: 'Pink Floyd'
+  #     },
+  #     albums: {
+  #       title: 'Animals'
+  #     }
+  #   }, q.filters)
+  # end
+
   def test_simple_sorting
     q = build_query({ sort: '-title,created_at' })
     assert_equal({title: :desc, created_at: :asc}, q.sorting)
