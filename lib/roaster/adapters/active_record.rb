@@ -24,9 +24,6 @@ module Roaster
         scope_for(query.target, model_class).first
       end
 
-      def create(query, model_class: nil)
-      end
-
       def read(query, model_class: nil)
         q = scope_for(query.target, model_class)
         query.includes.each do |i|
@@ -37,14 +34,6 @@ module Roaster
         end
         sort_q = query.sorting.map do |key, order|
           q = q.order(key => order)
-        end
-        q
-      end
-
-      def update(query)
-        q = self.scope_for(query.target)
-        query.filters.each_pair do |k, v|
-          q = q.where(k => v)
         end
         q
       end

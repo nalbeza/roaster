@@ -17,9 +17,10 @@ class ActiveRecordAdapterTest < MiniTest::Test
   end
 
   def test_interface
-    assert @adapter.respond_to?(:create)
+    assert @adapter.respond_to?(:new)
+    assert @adapter.respond_to?(:save)
+    assert @adapter.respond_to?(:find)
     assert @adapter.respond_to?(:read)
-    assert @adapter.respond_to?(:update)
     assert @adapter.respond_to?(:delete)
   end
 
