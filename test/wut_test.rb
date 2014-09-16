@@ -18,22 +18,23 @@ class PoniesTest < MiniTest::Test
                               #model_class: ::Blog::Category
   end
 
+  def build_target(resource_name = :albums, resource_ids = nil, relationship_name = nil, relationship_ids = nil)
+    Roaster::Query::Target.new(resource_name, resource_ids, relationship_name, relationship_ids)
+  end
+
   def test_ponies
-    params = {}
-    target = Roaster::Query::Target.new(:albums)
     rq = Roaster::Request.new(:read,
-                              target,
+                              build_target,
                               @ar_resource,
-                              params)
+                              {})
     res = rq.execute
     assert_equal([{"title" => "Animals"}, {"title" => "The Wall"}, {"title" => "Meddle"}], res)
   end
 
   def test_sorted_ponies
     params = {sort: :title}
-    target = Roaster::Query::Target.new(:albums)
     rq = Roaster::Request.new(:read,
-                              target,
+                              build_target,
                               @ar_resource,
                               params)
     res = rq.execute
@@ -41,15 +42,13 @@ class PoniesTest < MiniTest::Test
   end
 
   def test_create_pony
-    params = {}
-    target = Roaster::Query::Target.new(:albums)
     album_hash = {
       'title' => 'The Downward Spiral'
     }
     rq = Roaster::Request.new(:create,
-                              target,
+                              build_target,
                               @ar_resource,
-                              params,
+                              {},
                               document: album_hash)
 
     res = rq.execute
@@ -62,7 +61,7 @@ class PoniesTest < MiniTest::Test
     album_update_hash = {
       'title' => 'Antichrist Superstar'
     }
-    target = Roaster::Query::Target.new(:albums, album.id)
+    target = build_target(:albums, album.id)
     rq = Roaster::Request.new(:update,
                               target,
                               @ar_resource,
@@ -77,7 +76,7 @@ class PoniesTest < MiniTest::Test
   def test_delete_pony
     album = FactoryGirl.create(:album)
     album_id = album.id
-    target = Roaster::Query::Target.new(:albums, album_id)
+    target = build_target(:albums, album_id)
     rq = Roaster::Request.new(:delete,
                               target,
                               @ar_resource,
