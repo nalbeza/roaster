@@ -77,7 +77,14 @@ module Roaster
 
     def fields_from_params(params, mapping)
       return {} if params[:fields].blank?
-      {@target.resource_name => parse_fieldset(params[:fields])}
+      if params[:fields].class == Hash
+        Hash[params[:fields].collect do |resource_name, fieldset|
+            [resource_name.downcase.to_sym, parse_fieldset(fieldset)]
+          end
+        ]
+      else
+        {@target.resource_name => parse_fieldset(params[:fields])}
+      end
     end
 
     def filters_from_params(params, mapping)

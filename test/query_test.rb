@@ -83,14 +83,16 @@ class QueryTest < MiniTest::Test
     assert_equal({albums: [:title]}, q.fields)
   end
 
-  # TODO: Make this one pass !
-  # def test_typed_sparse_fieldsets
-  #   q = build_query({ fields: {
-  #     'band': 'name',
-  #     'albums': 'title'}
-  #   })
-  #   assert_equal({feilds: 'title'}, q.filters)
-  # end
+  def test_typed_sparse_fieldsets
+    q = build_query({ fields: {
+      'bands' => 'name,created_at',
+      'albums' => 'title'}
+    })
+    assert_equal({
+        bands: [:name, :created_at],
+        albums: [:title]
+      }, q.fields)
+  end
 
   private
 
