@@ -1,7 +1,6 @@
-require 'roaster/decorator'
+require 'roaster/json_api'
 
-class BandMapping < Roaster::Decorator
-  include Representable::Hash
+class BandMapping < Roaster::JsonApi::Mapping
 
   property :name
 end

@@ -1,25 +1,20 @@
 require 'representable/decorator'
 
-require 'roaster/json_api'
 
 module Roaster
 
   class Decorator < Representable::Decorator
 
-    #include Representable::Hash
-    #extend Roaster::JsonApi
+    def resource_name
+      if defined? @@overloaded_resource_name
+        @@overloaded_resource_name
+      else
+        self.class.to_s.gsub(/Mapping\Z/, '').underscore.pluralize
+      end
+    end
 
-    #representable_attrs[:_filterable_attributes] ||= []
-    #representable_attrs[:_includeable_attributes] ||= []
-    #representable_attrs[:_sortable_attributes] ||= []
 
     class << self
-=begin
-      def collection_representer_class
-        @collection_representer_class
-        Representable::Hash::Collection
-      end
-=end
 
       def can_filter_by(*attrs)
         representable_attrs[:_filterable_attributes] ||= []
@@ -57,6 +52,10 @@ module Roaster
       def includeable_attributes
         representable_attrs[:_includeable_attributes] ||= []
         representable_attrs[:_includeable_attributes]
+      end
+
+      def resource_name(name)
+        @@overloaded_resource_name = name
       end
 
     end

@@ -1,9 +1,13 @@
+require 'roaster/decorator'
 require 'representable/json'
 
 module Roaster
   module JsonApi
-
-    extend Representable::JSON
-
+    class Mapping < ::Roaster::Decorator
+      include Representable::Hash
+      def to_hash(options={})
+        super options
+      end
+    end
   end
 end

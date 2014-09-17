@@ -1,8 +1,6 @@
-require 'roaster/decorator'
+require 'roaster/json_api'
 
-class TrackMapping < Roaster::Decorator
-
-  include Representable::Hash
+class TrackMapping < Roaster::JsonApi::Mapping
 
   property :title
 

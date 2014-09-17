@@ -1,8 +1,6 @@
-require 'roaster/decorator'
+require 'roaster/json_api'
 
-class AlbumMapping < Roaster::Decorator
-
-  include Representable::Hash
+class AlbumMapping < Roaster::JsonApi::Mapping
 
   property :title
   #property :created_at
@@ -14,6 +12,8 @@ class AlbumMapping < Roaster::Decorator
   can_filter_by :band, :title
 
   can_sort_by :band, :title, :created_at, band: [:name]
+
+  # resource_name 'test_lautre'
 
   collection_representer class: Album
 end

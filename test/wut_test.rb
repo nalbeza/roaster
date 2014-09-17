@@ -198,4 +198,8 @@ class PoniesTest < MiniTest::Test
     refute Album.exists?(album_id)
   end
 
+  def test
+    
+  end
+
 end
