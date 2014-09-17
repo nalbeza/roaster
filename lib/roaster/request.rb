@@ -32,9 +32,14 @@ module Roaster
     def execute
       case @operation
       when :create
-        obj = @resource.new(@query)
-        parse(obj, @document)
-        @resource.save(obj)
+        #TODO: - IDEA - Maybe make `new` return a fake 'relationship' object so a relationship special case wouldn't be needed
+        if @query.target.relationship_name.nil?
+          obj = @resource.new(@query)
+          parse(obj, @document)
+          @resource.save(obj)
+        else
+          @resource.create_relationship(@query, @document)
+        end
       when :read
         res = @resource.query(@query)
         represent(res).to_hash

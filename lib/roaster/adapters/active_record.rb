@@ -20,6 +20,23 @@ module Roaster
         model.save!
       end
 
+      def create_relationship(query, document)
+        model = model_for(query.target.resource_name)
+        #TODO: Please refactor me, i'm ugly
+        object = model.find(query.target.resource_ids.first)
+        rel_name = query.target.relationship_name
+        rel_model = rel_name.to_s.classify.constantize
+        rel_meta = model.reflect_on_association(rel_name)
+        rel_object = rel_model.find(document[rel_name.to_s.pluralize])
+        case rel_meta.macro
+        when :has_many
+          object.send(rel_name).push(rel_object)
+        when :belongs_to
+          object.send("#{rel_name}=", rel_object)
+        end
+        self.save(object)
+      end
+
       def find(query, model_class: nil)
         raise 'No ID provided' if query.target.resource_ids.empty?
         scope_for(query.target, model_class).first
