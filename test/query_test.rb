@@ -55,7 +55,11 @@ class QueryTest < MiniTest::Test
 
   def test_simple_sorting
     q = build_query({ sort: '-title,created_at' })
-    assert_equal({title: :desc, created_at: :asc}, q.sorting)
+    assert_equal({
+      albums: {
+        title: :desc,
+        created_at: :asc}
+      }, q.sorting)
   end
 
   def test_typed_sorting

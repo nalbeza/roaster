@@ -50,6 +50,7 @@ module Roaster
         query.filters.each_pair do |k, v|
           q = q.where(k => v)
         end
+        # TODO: Sort by resource name
         sort_q = query.sorting.map do |key, order|
           q = q.order(key => order)
         end

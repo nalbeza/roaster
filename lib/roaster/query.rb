@@ -110,7 +110,7 @@ module Roaster
         end
         sorting_parameters
       else
-        parse_sort_criteria(params[:sort])
+        {@target.resource_name => parse_sort_criteria(params[:sort])}
       end
     end
 
