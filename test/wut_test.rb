@@ -110,16 +110,14 @@ class PoniesTest < MiniTest::Test
   end
 
   def test_add_to_one_relationship
-    #TODO: Make this one pass !
-    return
-    album = FactoryGirl.create :album, name: 'Ride the Lightning'
+    album = FactoryGirl.create :album, title: 'Ride the Lightning'
     band = FactoryGirl.create :band, name: 'Metallica'
 
-    params = {
+    document = {
       "bands" => band.id
     }
     target = build_target(:albums, album.id, :band)
-    rq = build_request(:create, params: params, document: album_hash)
+    rq = build_request(:create, target: target, document: document)
 
     res = rq.execute
     album.reload
@@ -131,19 +129,17 @@ class PoniesTest < MiniTest::Test
   end
 
   def test_add_to_many_relationship
-    #TODO: Make this one pass !
-    return
-    track_1 = FactoryGirl.create :track, name: 'Fight Fire With Fire'
-    # Track 2 omitted because it has the same name as the album
-    track_3 = FactoryGirl.create :track, name: 'For Whom The Bell Tolls'
-    track_4 = FactoryGirl.create :track, name: 'Fade to Black'
-    album = FactoryGirl.create :album, name: 'Ride the Lightning', tracks: [track_1]
+    track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
+    # Track 2 omitted because it has the same title as the album
+    track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
+    track_4 = FactoryGirl.create :track, title: 'Fade to Black'
+    album = FactoryGirl.create :album, title: 'Ride the Lightning', tracks: [track_1]
 
-    params = {
+    document = {
       "tracks" => [track_3.id.to_s, track_4.id.to_s]
     }
     target = build_target(:albums, album.id, :tracks)
-    rq = build_request(:create, params: params, document: album_hash)
+    rq = build_request(:create, target: target, document: document)
 
     res = rq.execute
     album.reload

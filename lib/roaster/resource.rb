@@ -1,7 +1,7 @@
 module Roaster
 
   class Resource
-    
+
     def initialize(adapter_class, opts = {})
       @adapter = adapter_class.new
       @model_class = opts[:model_class]
@@ -18,6 +18,10 @@ module Roaster
 
     def delete(query)
       @adapter.delete(query)
+    end
+
+    def create_relationship(query, document)
+      @adapter.create_relationship(query, document)
     end
 
     def find(query)
