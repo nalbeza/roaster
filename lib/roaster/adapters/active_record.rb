@@ -67,8 +67,10 @@ module Roaster
         query.filters.each_pair do |k, v|
           q = q.where(k => v)
         end
-        sort_q = query.sorting.map do |key, order|
-          q = q.order(key => order)
+        query.sorting.each do |resource_name, criteria|
+          criteria.each do |field, direction|
+            q = q.order(model_for(resource_name).arel_table[field].send(direction))
+          end
         end
         q
       end

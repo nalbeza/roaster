@@ -21,7 +21,7 @@ module Roaster
     end
 
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
-    attr_accessor :page, :page_size, :includes, :filters,
+    attr_accessor :page, :page_size, :includes, :fields, :filters,
                   :target,
                   :sorting,
                   :operation
@@ -39,6 +39,7 @@ module Roaster
       @page = params[:page] ? params[:page].to_i : 1
       @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
       @includes = includes_from_params(params, mapping)
+      @fields = fields_from_params(params, mapping)
       @filters = filters_from_params(params, mapping)
       @sorting = sorting_from_params(params, mapping)
       #VALIDATE THIS (TARGET) ! omgz =D
@@ -65,6 +66,24 @@ module Roaster
       includes = params[:include].split(',').map(&:to_sym)
       includes.select do |i|
         mapping.includeable_attributes.include?(i)
+      end
+    end
+
+    def parse_fieldset(fields)
+      fields.to_s.split(',').collect do |field|
+        field.downcase.to_sym
+      end
+    end
+
+    def fields_from_params(params, mapping)
+      return {} if params[:fields].blank?
+      if params[:fields].class == Hash
+        Hash[params[:fields].collect do |resource_name, fieldset|
+            [resource_name.downcase.to_sym, parse_fieldset(fieldset)]
+          end
+        ]
+      else
+        {@target.resource_name => parse_fieldset(params[:fields])}
       end
     end
 
@@ -98,7 +117,7 @@ module Roaster
         end
         sorting_parameters
       else
-        parse_sort_criteria(params[:sort])
+        {@target.resource_name => parse_sort_criteria(params[:sort])}
       end
     end
 

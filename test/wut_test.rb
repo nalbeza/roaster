@@ -50,7 +50,7 @@ class PoniesTest < MiniTest::Test
     assert_equal([{'title' => 'Animals'}, {'title' => 'The Wall'}, {'title' => 'Meddle'}, {'title' => 'Wages of Sin'}], res)
   end
 
-  def test_sorted_ponies
+   def test_sorted_ponies
     params = {sort: :title}
     rq = build_request(:read, params: params)
     res = rq.execute
