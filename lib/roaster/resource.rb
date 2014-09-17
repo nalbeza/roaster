@@ -24,6 +24,10 @@ module Roaster
       @adapter.create_relationship(query, document)
     end
 
+    def update_relationships(query, document)
+      @adapter.update_relationship(query, document)
+    end
+
     def find(query)
       @adapter.find(query, model_class: @model_class)
     end

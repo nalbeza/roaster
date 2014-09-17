@@ -20,21 +20,38 @@ module Roaster
         model.save!
       end
 
-      def create_relationship(query, document)
+      #TODO: Please refactor me, i'm ugly
+      def _change_relationship(query, rel_name, rel_ids, replace: false)
         model = model_for(query.target.resource_name)
-        #TODO: Please refactor me, i'm ugly
         object = model.find(query.target.resource_ids.first)
-        rel_name = query.target.relationship_name
         rel_model = rel_name.to_s.classify.constantize
         rel_meta = model.reflect_on_association(rel_name)
-        rel_object = rel_model.find(document[rel_name.to_s.pluralize])
+        rel_object = rel_model.find(rel_ids)
         case rel_meta.macro
         when :has_many
+          object.send(rel_name).clear if replace === true
           object.send(rel_name).push(rel_object)
         when :belongs_to
           object.send("#{rel_name}=", rel_object)
+        else
+          raise "#{rel_meta.macro} relationship not implemented"
         end
         self.save(object)
+      end
+
+      #TODO:
+      # Document key isn't always rel_name, it's rel_name's resource type
+      #   ( not accessible here right now :-( )
+      def create_relationship(query, document)
+        rel_name = query.target.relationship_name
+        rel_ids = document[rel_name.to_s.pluralize]
+        _change_relationship(query, rel_name, rel_ids)
+      end
+
+      def update_relationship(query, document)
+        document.each do |rel_name, rel_ids|
+          _change_relationship(query, rel_name.to_sym, rel_ids, replace: true)
+        end
       end
 
       def find(query, model_class: nil)

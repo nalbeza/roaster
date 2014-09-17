@@ -45,6 +45,8 @@ module Roaster
         represent(res).to_hash
       when :update
         obj = @resource.find(@query)
+        links = @document.delete('links')
+        @resource.update_relationships(@query, links) if links
         parse(obj, @document)
         @resource.save(obj)
       when :delete

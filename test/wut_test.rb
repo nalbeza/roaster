@@ -104,11 +104,6 @@ class PoniesTest < MiniTest::Test
     assert_equal 'The Downward Spiral', res.title
   end
 
-
-  def test_update_to_one_relationship
-    #TODO
-  end
-
   def test_add_to_one_relationship
     album = FactoryGirl.create :album, title: 'Ride the Lightning'
     band = FactoryGirl.create :band, name: 'Metallica'
@@ -122,10 +117,6 @@ class PoniesTest < MiniTest::Test
     res = rq.execute
     album.reload
     assert_equal album.band.name, band.name
-  end
-
-  def test_update_to_many_relationship
-    #TODO
   end
 
   def test_add_to_many_relationship
@@ -143,7 +134,7 @@ class PoniesTest < MiniTest::Test
 
     res = rq.execute
     album.reload
-    assert_equal album.tracks.count, 3
+    assert_equal 3, album.tracks.count
     assert_equal Set.new(album.tracks.map(&:id)), Set.new([track_1, track_3, track_4].map(&:id))
   end
 
@@ -158,6 +149,43 @@ class PoniesTest < MiniTest::Test
     res = rq.execute
     assert_equal album.id, res.id
     assert_equal 'Antichrist Superstar', res.title
+  end
+
+  def test_update_to_one_relationship
+    album = FactoryGirl.create(:album, title: 'Killing Is My Business... and Business Is Good!')
+    band = FactoryGirl.create(:band, name: 'Megadeth')
+    album_update_hash = {
+      'links' => {
+        'band' => band.id.to_s
+      }
+    }
+    target = build_target(:albums, album.id)
+    rq = build_request(:update, target: target, document: album_update_hash)
+
+    res = rq.execute
+    album.reload
+    assert_equal 'Megadeth', album.band.name
+  end
+
+  def test_update_to_many_relationship
+    track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
+    # Track 2 omitted because it has the same title as the album
+    track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
+    track_4 = FactoryGirl.create :track, title: 'Fade to Black'
+    album = FactoryGirl.create :album, title: 'Ride the Lightning', tracks: [track_1]
+
+    document = {
+      'links' => {
+        'tracks' => [track_3.id.to_s, track_4.id.to_s]
+      }
+    }
+    target = build_target(:albums, album.id, :tracks)
+    rq = build_request(:update, target: target, document: document)
+
+    res = rq.execute
+    album.reload
+    assert_equal 2, album.tracks.count
+    assert_equal Set.new(album.tracks.map(&:id)), Set.new([track_3, track_4].map(&:id))
   end
 
   def test_delete_pony
