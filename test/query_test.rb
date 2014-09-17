@@ -58,7 +58,7 @@ class QueryTest < MiniTest::Test
     assert_equal({title: :desc, created_at: :asc}, q.sorting)
   end
 
-  def test_nested_sorting
+  def test_typed_sorting
     q = build_query({ sort: {
       band: 'name',
       albums: '-created_at,title'
@@ -73,6 +73,20 @@ class QueryTest < MiniTest::Test
       }
     }, q.sorting)
   end
+
+  def test_sparse_fieldsets
+    q = build_query({ fields: 'title' })
+    assert_equal({albums: [:title]}, q.fields)
+  end
+
+  # TODO: Make this one pass !
+  # def test_typed_sparse_fieldsets
+  #   q = build_query({ fields: {
+  #     'band': 'name',
+  #     'albums': 'title'}
+  #   })
+  #   assert_equal({feilds: 'title'}, q.filters)
+  # end
 
   private
 

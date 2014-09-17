@@ -21,7 +21,7 @@ module Roaster
     end
 
     #TODO: This is not validating includes it seems (HARD VALIDATE EVERYTHING, raise is your FRIEND)
-    attr_accessor :page, :page_size, :includes, :filters,
+    attr_accessor :page, :page_size, :includes, :fields, :filters,
                   :target,
                   :sorting,
                   :operation
@@ -39,6 +39,7 @@ module Roaster
       @page = params[:page] ? params[:page].to_i : 1
       @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
       @includes = includes_from_params(params, mapping)
+      @fields = fields_from_params(params, mapping)
       @filters = filters_from_params(params, mapping)
       @sorting = sorting_from_params(params, mapping)
       #VALIDATE THIS (TARGET) ! omgz =D
@@ -66,6 +67,17 @@ module Roaster
       includes.select do |i|
         mapping.includeable_attributes.include?(i)
       end
+    end
+
+    def parse_fieldset(fields)
+      fields.to_s.split(',').collect do |field|
+        field.downcase.to_sym
+      end
+    end
+
+    def fields_from_params(params, mapping)
+      return {} if params[:fields].blank?
+      {@target.resource_name => parse_fieldset(params[:fields])}
     end
 
     def filters_from_params(params, mapping)
