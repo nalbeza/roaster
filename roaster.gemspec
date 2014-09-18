@@ -16,15 +16,15 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Roaster::VERSION
 
-  gem.add_runtime_dependency "representable", "~> 2.0.0"
-  gem.add_runtime_dependency "activerecord", "~> 4.1.0"
-  gem.add_runtime_dependency "activesupport", "~> 4.1.0"
+  gem.add_runtime_dependency "representable", "~> 2.0"
+  gem.add_runtime_dependency "activerecord", "~> 4.1"
+  gem.add_runtime_dependency "activesupport", "~> 4.1"
 
   gem.add_development_dependency 'minitest', '~> 5.1'
   gem.add_development_dependency 'rake', '~> 10.3'
   gem.add_development_dependency 'factory_girl', '~> 4.4'
   gem.add_development_dependency 'sqlite3', '~> 1.3'
   gem.add_development_dependency 'database_cleaner', '~> 1.3'
-  gem.add_development_dependency 'byebug'
+  gem.add_development_dependency 'byebug', '~> 3.4'
 
 end
