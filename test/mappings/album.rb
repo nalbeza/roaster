@@ -3,7 +3,7 @@ require 'roaster/json_api'
 class AlbumMapping < Roaster::JsonApi::Mapping
 
   property :title
-  #property :created_at
+  # property :created_at
 
   # TODO: auto include included mapping
   # Aiming: Nested sparse fieldsets authorizations and default behaviour for sort

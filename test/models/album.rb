@@ -4,6 +4,7 @@ require 'active_record'
 ActiveRecord::Migration.class_eval do
   create_table :albums do |t|
     t.string  :title
+    # t.datetime :created_at
     t.belongs_to :band
   end
 end

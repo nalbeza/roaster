@@ -5,14 +5,9 @@ module Roaster
 
   class Decorator < Representable::Decorator
 
-    def resource_name
-      if defined? @@overloaded_resource_name
-        @@overloaded_resource_name
-      else
-        self.class.to_s.gsub(/Mapping\Z/, '').underscore.pluralize
-      end
+    def resource_id
+      self.represented.attributes['id']
     end
-
 
     class << self
 
@@ -52,6 +47,14 @@ module Roaster
       def includeable_attributes
         representable_attrs[:_includeable_attributes] ||= []
         representable_attrs[:_includeable_attributes]
+      end
+
+      def get_resource_name
+        if defined? @@overloaded_resource_name
+          @@overloaded_resource_name
+        else
+          self.to_s.gsub(/Mapping\Z/, '').underscore.pluralize
+        end
       end
 
       def resource_name(name)

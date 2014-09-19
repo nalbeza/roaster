@@ -42,7 +42,7 @@ module Roaster
         end
       when :read
         res = @resource.query(@query)
-        represent(res).to_hash
+        represent(res)
       when :update
         obj = @resource.find(@query)
         links = @document.delete('links')
@@ -62,10 +62,13 @@ module Roaster
     end
 
     def represent(data)
-      if data.respond_to?(:each)
-        @mapping_class.for_collection.prepare(data)
+      if @query.target.resource_ids.size == 1
+        @mapping_class.prepare(data.first).to_hash({single_resource: true})
+      elsif data.respond_to?(:each)
+        @mapping_class.for_collection.prepare(data).to_hash({}, Roaster::JsonApi::CollectionBinding)
       else
-        @mapping_class.prepare(data)
+        # TODO: HANDLE ERROR ?
+        byebug
       end
     end
 
