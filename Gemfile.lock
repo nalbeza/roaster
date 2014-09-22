@@ -4,7 +4,7 @@ PATH
     roaster (0.0.4)
       activerecord (~> 4.1)
       activesupport (~> 4.1)
-      representable (~> 2.0)
+      representable (~> 2.0.4)
 
 GEM
   remote: http://rubygems.org/

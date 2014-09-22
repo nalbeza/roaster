@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Roaster::VERSION
 
-  gem.add_runtime_dependency "representable", "~> 2.0"
+  gem.add_runtime_dependency "representable", "~> 2.0.4"
   gem.add_runtime_dependency "activerecord", "~> 4.1"
   gem.add_runtime_dependency "activesupport", "~> 4.1"
 
