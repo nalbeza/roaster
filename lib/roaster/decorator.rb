@@ -11,6 +11,19 @@ module Roaster
 
     class << self
 
+      def has_one(name)
+        property :_links, :inherit => true, :use_decorator => true do
+          property name, type: :has_one
+        end
+      end
+
+      #PING: Overriding build_definition is maybe required
+      def has_many(name)
+        property :_links, :inherit => true, :use_decorator => true do
+          collection name, type: :has_many
+        end
+      end
+
       def can_filter_by(*attrs)
         representable_attrs[:_filterable_attributes] ||= []
         representable_attrs[:_filterable_attributes].push(*attrs.map(&:to_sym)).uniq!
