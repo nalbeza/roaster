@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    roaster (0.0.2)
+    roaster (0.0.4)
       activerecord (~> 4.1)
       activesupport (~> 4.1)
       representable (~> 2.0)
