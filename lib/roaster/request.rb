@@ -44,6 +44,7 @@ module Roaster
           obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
           @resource.create_relationships(obj, {@query.target.relationship_name => @document})
         end
+        #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
       when :read
         res = @resource.query(@query)
         represent(res)
@@ -53,7 +54,7 @@ module Roaster
         @resource.update_relationships(obj, links) if links
         parse(obj, @document) unless @document.empty?
         @resource.save(obj)
-        #TODO: Notify caller if the resource itself was updated (not links), useful for JSONAPI spec (HTTP 200 or 204)
+        #TODO: Notify caller if the resource itself was updated, or only links, useful for JSONAPI spec (HTTP 200 or 204)
       when :delete
         @resource.delete(@query)
       end
