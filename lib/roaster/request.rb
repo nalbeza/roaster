@@ -49,7 +49,7 @@ module Roaster
         obj = @resource.find(@query)
         links = @document.delete('links')
         @resource.update_relationships(@query, links) if links
-        parse(obj, @document)
+        parse(obj, @document) unless @document.empty?
         @resource.save(obj)
         # represent(res)
       when :delete
@@ -72,7 +72,6 @@ module Roaster
       else
         @mapping_class.prepare(data).to_hash({roaster: :resource})
         # TODO: HANDLE ERROR ?
-        # byebug
       end
     end
 
