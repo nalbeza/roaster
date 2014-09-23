@@ -38,6 +38,12 @@ module Roaster
           links[link[:name]] = @represented[link[:key]].to_s
         end unless representable_attrs[:_has_one].nil?
 
+
+        representable_attrs[:_has_many].each do |link|
+          representable_attrs[:definitions].delete(link[:name].to_s)
+          links[link[:name]] = @represented.send(link[:key]).map(&:to_s) || []
+        end unless representable_attrs[:_has_many].nil?
+
         if roaster_type.nil?
           resource_id.to_s
         else

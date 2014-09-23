@@ -48,27 +48,36 @@ class PoniesTest < MiniTest::Test
     target = build_target(:albums, 1)
     rq = build_request(:read, target: target)
     res = rq.execute
-    assert_equal({'albums'=>{'id'=>'1', 'title'=>'Animals'}}, res)
+    assert_equal({'albums'=>{'id'=>'1', 'links'=>{'tracks'=>[]}, 'title'=>'Animals'}}, res)
   end
 
   def test_ponies
     rq = build_request(:read)
     res = rq.execute
-    assert_equal({'albums' => [{'id' => '1', 'title' => 'Animals'}, {'id' => '2', 'title' => 'The Wall'}, {'id' => '3', 'title' => 'Meddle'}, {'id' => '4', 'title' => 'Wages of Sin'}]}, res)
+    assert_equal({'albums' => [
+      {'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'},
+      {'id' => '2', 'links'=>{'tracks'=>[]}, 'title' => 'The Wall'},
+      {'id' => '3', 'links'=>{'tracks'=>[]}, 'title' => 'Meddle'},
+      {'id' => '4', 'links'=>{'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]}, res)
   end
 
    def test_sorted_ponies
     params = {sort: :title}
     rq = build_request(:read, params: params)
     res = rq.execute
-    assert_equal({'albums' => [{'id' => '1', 'title' => 'Animals'}, {'id' => '3', 'title' => 'Meddle'}, {'id' => '2', 'title' => 'The Wall'}, {'id' => '4', 'title' => 'Wages of Sin'}]}, res)
+    assert_equal({'albums' => [
+        {'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'},
+        {'id' => '3', 'links'=>{'tracks'=>[]}, 'title' => 'Meddle'},
+        {'id' => '2', 'links'=>{'tracks'=>[]}, 'title' => 'The Wall'},
+        {'id' => '4', 'links'=>{'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]},
+      res)
   end
 
   def test_simple_filtered_ponies
     params = {title: 'Animals'}
     rq = build_request(:read, params: params)
     res = rq.execute
-    assert_equal({'albums' => [{'id' => '1', 'title' => 'Animals'}]}, res)
+    assert_equal({'albums' => [{'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'}]}, res)
   end
 
   #TODO: Make this one pass !
@@ -193,6 +202,27 @@ class PoniesTest < MiniTest::Test
         title: 'Fight Fire With Fire',
       }}, res)
   end
+
+  def test_read_has_many_links
+    track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
+    # Track 2 omitted because it has the same title as the album
+    track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
+    track_4 = FactoryGirl.create :track, title: 'Fade to Black'
+    album = FactoryGirl.create :album, title: 'Ride the Lightning', tracks: [track_1, track_3, track_4]
+    # byebug
+    target = build_target(:album, album)
+    rq = build_request(:read, target: target)
+    res = rq.execute
+    assert_json_match({
+      albums: {
+        id: '5',
+        links: {
+          tracks: [track_1.id.to_s, track_3.id.to_s, track_4.id.to_s]
+        },
+        title: 'Ride the Lightning',
+      }}, res)
+  end
+
 
   def test_update_to_many_relationship
     track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'

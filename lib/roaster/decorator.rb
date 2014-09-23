@@ -21,7 +21,7 @@ module Roaster
       def has_many(name)
         representable_attrs[:_has_many] ||= []
         collection name
-        representable_attrs[:_has_many].push({key: name.to_s + '_ids', name: name.to_s})
+        representable_attrs[:_has_many].push({key: name.to_s.singularize + '_ids', name: name.to_s})
       end
 
       def can_filter_by(*attrs)
