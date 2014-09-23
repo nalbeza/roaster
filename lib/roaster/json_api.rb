@@ -6,29 +6,17 @@ require 'representable/bindings/hash_bindings'
 module Roaster
   module JsonApi
 
-    class Binding < Representable::Hash::PropertyBinding
-      alias_method :parent_serialize, :serialize
-
-      def serialize(value)
-        super
-      end
-
-      def serialize_collection(value)
-        @mapping_class = @definition[:extend].instance_variable_get('@value')
-        collection = value.collect { |item|
-          parent_serialize(item)
-        }
-        { @mapping_class.get_resource_name => collection }
-      end
-    end
-
-    class CollectionBinding < Binding
+    class CollectionBinding < Representable::Hash::PropertyBinding
       def self.build_for(definition, *args)
         self.new(definition, *args)
       end
 
       def serialize(value)
-        serialize_collection(value)
+        @mapping_class = @definition[:extend].instance_variable_get('@value')
+        collection = value.collect { |item|
+          super(item)
+        }
+        { @mapping_class.get_resource_name => collection }
       end
 
       # TODO
