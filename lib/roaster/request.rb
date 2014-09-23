@@ -36,9 +36,11 @@ module Roaster
         if @query.target.relationship_name.nil?
           obj = @resource.new(@query)
           parse(obj, @document)
-          @resource.save(obj)
+          res = @resource.save(obj)
+          represent(res)
         else
           @resource.create_relationship(@query, @document)
+          # represent(res)
         end
       when :read
         res = @resource.query(@query)
@@ -49,6 +51,7 @@ module Roaster
         @resource.update_relationships(@query, links) if links
         parse(obj, @document)
         @resource.save(obj)
+        # represent(res)
       when :delete
         @resource.delete(@query)
       end
@@ -67,8 +70,9 @@ module Roaster
       elsif data.respond_to?(:each)
         @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection}, Roaster::JsonApi::CollectionBinding)
       else
+        @mapping_class.prepare(data).to_hash({roaster: :resource})
         # TODO: HANDLE ERROR ?
-        byebug
+        # byebug
       end
     end
 

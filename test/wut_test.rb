@@ -120,8 +120,9 @@ class PoniesTest < MiniTest::Test
     rq = build_request(:create, document: album_hash)
 
     res = rq.execute
-    refute_nil res.id
-    assert_equal 'The Downward Spiral', res.title
+    refute_nil res['albums']
+    refute_nil res['albums']['id']
+    assert_equal 'The Downward Spiral', res['albums']['title']
   end
 
   def test_add_to_one_relationship
@@ -203,13 +204,34 @@ class PoniesTest < MiniTest::Test
       }}, res)
   end
 
+
+  def test_create_with_has_one_links
+    album = FactoryGirl.create :album, title: 'Ride the Lightning'
+    track_hash = {
+      'title' => 'Fight Fire With Fire',
+      'links' => {
+        'album' => album.id.to_s
+      }
+    }
+    target = build_target(:tracks)
+    rq = build_request(:create, target: target, document: track_hash)
+    res = rq.execute
+    assert_json_match({
+      tracks: {
+        id: '4',
+        links: {
+          album: '5'
+        },
+        title: 'Fight Fire With Fire',
+      }}, res)
+  end
+
   def test_read_has_many_links
     track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
     # Track 2 omitted because it has the same title as the album
     track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
     track_4 = FactoryGirl.create :track, title: 'Fade to Black'
     album = FactoryGirl.create :album, title: 'Ride the Lightning', tracks: [track_1, track_3, track_4]
-    # byebug
     target = build_target(:album, album)
     rq = build_request(:read, target: target)
     res = rq.execute

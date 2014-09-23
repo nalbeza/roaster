@@ -35,7 +35,7 @@ module Roaster
 
         representable_attrs[:_has_one].each do |link|
           representable_attrs[:definitions].delete(link[:name].to_s)
-          links[link[:name]] = @represented[link[:key]].to_s
+          links[link[:name]] = @represented[link[:key]].nil? ? nil : @represented[link[:key]].to_s
         end unless representable_attrs[:_has_one].nil?
 
 
