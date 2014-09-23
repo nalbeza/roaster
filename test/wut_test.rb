@@ -178,6 +178,22 @@ class PoniesTest < MiniTest::Test
     assert_equal 'Megadeth', album.band.name
   end
 
+  def test_read_has_one_links
+    album = FactoryGirl.create :album, title: 'Ride the Lightning'
+    track = FactoryGirl.create :track, title: 'Fight Fire With Fire', album: album
+    target = build_target(:track, track)
+    rq = build_request(:read, target: target)
+    res = rq.execute
+    assert_json_match({
+      tracks: {
+        id: '4',
+        links: {
+          album: '5'
+        },
+        title: 'Fight Fire With Fire',
+      }}, res)
+  end
+
   def test_update_to_many_relationship
     track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
     # Track 2 omitted because it has the same title as the album

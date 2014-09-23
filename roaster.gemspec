@@ -26,5 +26,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'sqlite3', '~> 1.3'
   gem.add_development_dependency 'database_cleaner', '~> 1.3'
   gem.add_development_dependency 'byebug', '~> 3.4'
+  gem.add_development_dependency 'json_expressions'
 
 end

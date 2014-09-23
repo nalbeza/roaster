@@ -63,9 +63,9 @@ module Roaster
 
     def represent(data)
       if @query.target.resource_ids.size == 1
-        @mapping_class.prepare(data.first).to_hash({single_resource: true})
+        @mapping_class.prepare(data.first).to_hash({roaster: :resource})
       elsif data.respond_to?(:each)
-        @mapping_class.for_collection.prepare(data).to_hash({}, Roaster::JsonApi::CollectionBinding)
+        @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection}, Roaster::JsonApi::CollectionBinding)
       else
         # TODO: HANDLE ERROR ?
         byebug

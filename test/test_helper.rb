@@ -3,6 +3,7 @@ require 'database_cleaner'
 require 'awesome_print'
 require 'factory_girl'
 require 'byebug'
+require 'json_expressions/minitest'
 
 require_relative 'support/active_record'
 require_relative 'models/album'

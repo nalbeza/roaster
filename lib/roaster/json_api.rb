@@ -41,11 +41,28 @@ module Roaster
       include Representable::JSON
 
       def to_hash(option)
-        obj = {'id' => resource_id.to_s}.merge super(option)
-        if option[:single_resource].nil?
-          obj
+
+        roaster_type = option[:roaster]
+        links = {}
+
+        representable_attrs[:_has_one].each do |link|
+          representable_attrs[:definitions].delete(link[:name].to_s)
+          links[link[:name]] = @represented[link[:key]].to_s
+        end unless representable_attrs[:_has_one].nil?
+
+        if roaster_type.nil?
+          resource_id.to_s
         else
-          { self.class.get_resource_name => obj }
+          sup = {'id' => resource_id.to_s }
+          sup.merge!({'links' => links }) unless links.empty?
+          case roaster_type
+            when :resource
+              {
+                self.class.get_resource_name => sup.merge(super(option))
+              }
+            when :collection
+              sup.merge(super(option))
+          end
         end
       end
 
