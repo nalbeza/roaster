@@ -29,6 +29,7 @@ module Roaster
       include Representable::JSON
 
       def from_hash(hash, options = {})
+        return super
         super(hash[self.class.get_resource_name], options)
       end
 

@@ -26,32 +26,34 @@ module Roaster
       @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       #TODO: Oh snap this is confusing
-      @document = opts[:document]
+      @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
     end
 
     def execute
       case @operation
       when :create
-        #TODO: - IDEA - Maybe make `new` return a fake 'relationship' object so a relationship special case wouldn't be needed
         if @query.target.relationship_name.nil?
           obj = @resource.new(@query)
+          links = @document.delete('links')
           parse(obj, @document)
+          #TODO: Allow rel creation before saving (has_one requires a single update query)
           res = @resource.save(obj)
+          @resource.create_relationships(obj, links) if links
           represent(res)
         else
-          @resource.create_relationship(@query, @document)
-          # represent(res)
+          obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
+          @resource.create_relationships(obj, {@query.target.relationship_name => @document})
         end
       when :read
         res = @resource.query(@query)
         represent(res)
       when :update
-        obj = @resource.find(@query)
+        obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
         links = @document.delete('links')
-        @resource.update_relationships(@query, links) if links
+        @resource.update_relationships(obj, links) if links
         parse(obj, @document) unless @document.empty?
         @resource.save(obj)
-        # represent(res)
+        #TODO: Notify caller if the resource itself was updated (not links), useful for JSONAPI spec (HTTP 200 or 204)
       when :delete
         @resource.delete(@query)
       end

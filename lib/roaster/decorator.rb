@@ -11,6 +11,10 @@ module Roaster
 
     class << self
 
+      def strip(doc)
+        doc[get_resource_name] || doc
+      end
+
       def has_one(name)
         representable_attrs[:_has_one] ||= []
         property name

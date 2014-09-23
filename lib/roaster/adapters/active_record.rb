@@ -20,12 +20,13 @@ module Roaster
         model.save!
       end
 
+      #TODO: Underscore does not mean private, only `private` does
       #TODO: Please refactor me, i'm ugly
-      def _change_relationship(query, rel_name, rel_ids, replace: false)
-        model = model_for(query.target.resource_name)
-        object = model.find(query.target.resource_ids.first)
+      # I need the model instance please, i'm hungry
+      def _change_relationship(object, rel_name, rel_ids, replace: false)
+        #TODO: Refactor model searching
         rel_model = rel_name.to_s.classify.constantize
-        rel_meta = model.reflect_on_association(rel_name)
+        rel_meta = object.class.reflect_on_association(rel_name)
         rel_object = rel_model.find(rel_ids)
         case rel_meta.macro
         when :has_many
@@ -39,24 +40,28 @@ module Roaster
         self.save(object)
       end
 
-      #TODO:
-      # Document key isn't always rel_name, it's rel_name's resource type
-      #   ( not accessible here right now :-( )
-      def create_relationship(query, document)
-        rel_name = query.target.relationship_name
-        rel_ids = document[rel_name.to_s.pluralize]
-        _change_relationship(query, rel_name, rel_ids)
-      end
-
-      def update_relationship(query, document)
-        document.each do |rel_name, rel_ids|
-          _change_relationship(query, rel_name.to_sym, rel_ids, replace: true)
+      def _change_relationships(object, rels, replace: false)
+        rels.each do |name, v|
+          _change_relationship(object, name, v, replace: replace)
         end
       end
 
-      def find(query, model_class: nil)
-        raise 'No ID provided' if query.target.resource_ids.empty?
-        scope_for(query.target, model_class).first
+      #TODO:
+      # Document key isn't always rel_name, it's rel_name's resource type
+      #   ( not accessible here right now :-( )
+      def create_relationships(object, rels)
+        _change_relationships(object, rels)
+      end
+
+      def update_relationships(object, rels)
+        _change_relationships(object, rels, replace: true)
+      end
+
+      def find(res_name, res_ids, model_class: nil)
+        model_class = model_for(model_class || res_name)
+        raise 'No IDs given' if res_ids.empty?
+        #TODO: Not sure if this is a good idea to handle this here
+        model_class.find(res_ids.size == 1 ? res_ids.first : res_ids)
       end
 
       def read(query, model_class: nil)

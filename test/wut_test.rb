@@ -221,7 +221,7 @@ class PoniesTest < MiniTest::Test
     }
     target = build_target(:tracks)
     rq = build_request(:create, target: target, document: track_hash)
-    byebug
+    #byebug
     res = rq.execute
     assert_json_match({
       tracks: {
