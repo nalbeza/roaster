@@ -23,6 +23,7 @@ module Roaster
       end
       @operation = operation
       @resource = resource
+      @resource_mapping_class = self.class.mapping_class_from_name(target.resource_name)
       @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       #TODO: Oh snap this is confusing
@@ -39,7 +40,7 @@ module Roaster
           #TODO: Allow rel creation before saving (has_one requires a single update query)
           res = @resource.save(obj)
           @resource.create_relationships(obj, links) if links
-          represent(res)
+          represent(res, singular: true)
         else
           obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
           @resource.create_relationships(obj, {@query.target.relationship_name => @document})
@@ -47,7 +48,14 @@ module Roaster
         #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
       when :read
         res = @resource.query(@query)
-        represent(res)
+        target = @query.target
+        rel_name = target.relationship_name
+        singular = target.resource_ids.size == 1 && rel_name.nil?
+        if rel_name
+          has_one_attrs = @resource_mapping_class.representable_attrs[:_has_one]
+          singular = has_one_attrs && has_one_attrs.one? {|h| h[:name] == rel_name }
+        end
+        represent(res, singular: singular)
       when :update
         obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
         links = @document.delete('links')
@@ -67,14 +75,13 @@ module Roaster
       rp.from_hash(data)
     end
 
-    def represent(data)
-      if @query.target.resource_ids.size == 1
+    def represent(data, singular: false)
+      if singular && data.respond_to?(:first)
         @mapping_class.prepare(data.first).to_hash({roaster: :resource})
       elsif data.respond_to?(:each)
         @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection}, Roaster::JsonApi::CollectionBinding)
       else
         @mapping_class.prepare(data).to_hash({roaster: :resource})
-        # TODO: HANDLE ERROR ?
       end
     end
 

@@ -15,9 +15,9 @@ class PoniesTest < MiniTest::Test
   def setup
     super
     #TODO: Replace this by fixtures
-    FactoryGirl.create(:animals_album)
-    FactoryGirl.create(:the_wall_album)
-    FactoryGirl.create(:meddle_album)
+    FactoryGirl.create(:animals_album, band: nil)
+    FactoryGirl.create(:the_wall_album, band: nil)
+    FactoryGirl.create(:meddle_album, band: nil)
 =begin
  1 - Enemy Within
  2 - Burning Angel
@@ -45,20 +45,28 @@ class PoniesTest < MiniTest::Test
   end
 
   def test_single
-    target = build_target(:albums, 1)
+    target = build_target(:albums, @wages_of_sin_album.id.to_s)
     rq = build_request(:read, target: target)
     res = rq.execute
-    assert_equal({'albums'=>{'id'=>'1', 'links'=>{'tracks'=>[]}, 'title'=>'Animals'}}, res)
+    assert_equal({
+      'albums' => {
+        'id' => @wages_of_sin_album.id.to_s,
+        'links' => {
+          'band' => @wages_of_sin_album.band_id.to_s,
+          'tracks' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s)
+        },
+        'title'=>@wages_of_sin_album.title}
+    }, res)
   end
 
   def test_ponies
     rq = build_request(:read)
     res = rq.execute
     assert_equal({'albums' => [
-      {'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'},
-      {'id' => '2', 'links'=>{'tracks'=>[]}, 'title' => 'The Wall'},
-      {'id' => '3', 'links'=>{'tracks'=>[]}, 'title' => 'Meddle'},
-      {'id' => '4', 'links'=>{'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]}, res)
+      {'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'},
+      {'id' => '2', 'links'=>{'band' => nil,'tracks'=>[]}, 'title' => 'The Wall'},
+      {'id' => '3', 'links'=>{'band' => nil,'tracks'=>[]}, 'title' => 'Meddle'},
+      {'id' => '4', 'links'=>{'band' => @wages_of_sin_album.band_id.to_s,'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]}, res)
   end
 
    def test_sorted_ponies
@@ -66,10 +74,10 @@ class PoniesTest < MiniTest::Test
     rq = build_request(:read, params: params)
     res = rq.execute
     assert_equal({'albums' => [
-        {'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'},
-        {'id' => '3', 'links'=>{'tracks'=>[]}, 'title' => 'Meddle'},
-        {'id' => '2', 'links'=>{'tracks'=>[]}, 'title' => 'The Wall'},
-        {'id' => '4', 'links'=>{'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]},
+        {'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'},
+        {'id' => '3', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Meddle'},
+        {'id' => '2', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'The Wall'},
+        {'id' => '4', 'links'=>{'band' => @wages_of_sin_album.band_id.to_s, 'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]},
       res)
   end
 
@@ -77,7 +85,7 @@ class PoniesTest < MiniTest::Test
     params = {title: 'Animals'}
     rq = build_request(:read, params: params)
     res = rq.execute
-    assert_equal({'albums' => [{'id' => '1', 'links'=>{'tracks'=>[]}, 'title' => 'Animals'}]}, res)
+    assert_equal({'albums' => [{'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'}]}, res)
   end
 
   #TODO: Make this one pass !
@@ -95,22 +103,24 @@ class PoniesTest < MiniTest::Test
     assert_equal @arch_enemy_band.name, res.first.band.name
   end
 
-  #TODO: Make this one pass !
   def test_read_to_one_relationship
-    return
-    target = build_target(:albums, @wages_of_sin_album, :band)
+    target = build_target(:albums, @wages_of_sin_album.id.to_s, :band)
     rq = build_request(:read, target: target)
     res = rq.execute
-    assert_equal({'name' => 'Arch Enemy'}, res)
+    assert_equal({'bands' => {'id' => @wages_of_sin_album.band_id.to_s, 'name' => 'Arch Enemy'}}, res)
   end
 
-  #TODO: Make this one pass !
   def test_read_to_many_relationship
-    return
-    target = build_target(:albums, @wages_of_sin_album, :tracks)
+    target = build_target(:albums, @wages_of_sin_album.id.to_s, :tracks)
     rq = build_request(:read, target: target)
     res = rq.execute
-    assert_equal({'tracks'=> [{'id'=>'1', 'title' => 'Enemy Within'}, {'id'=>'2', 'title' => 'Burning Angel'}, {'id'=>'3', 'title' => 'Heart Of Darkness'}]}, res)
+    assert_equal({
+      'tracks'=> [
+        {'id'=>'1', 'title' => 'Enemy Within', 'links' => {'album' => @wages_of_sin_album.id.to_s} },
+        {'id'=>'2', 'title' => 'Burning Angel', 'links' => {'album' => @wages_of_sin_album.id.to_s} },
+        {'id'=>'3', 'title' => 'Heart Of Darkness', 'links' => {'album' => @wages_of_sin_album.id.to_s} }
+      ]
+    }, res)
   end
 
   def test_create_pony
@@ -221,7 +231,6 @@ class PoniesTest < MiniTest::Test
     }
     target = build_target(:tracks)
     rq = build_request(:create, target: target, document: track_hash)
-    #byebug
     res = rq.execute
     assert_json_match({
       tracks: {
@@ -239,14 +248,15 @@ class PoniesTest < MiniTest::Test
     track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
     track_4 = FactoryGirl.create :track, title: 'Fade to Black'
     album = FactoryGirl.create :album, title: 'Ride the Lightning', tracks: [track_1, track_3, track_4]
-    target = build_target(:album, album)
+    target = build_target(:album, album.id.to_s)
     rq = build_request(:read, target: target)
     res = rq.execute
     assert_json_match({
       albums: {
         id: '5',
         links: {
-          tracks: [track_1.id.to_s, track_3.id.to_s, track_4.id.to_s]
+          tracks: [track_1.id.to_s, track_3.id.to_s, track_4.id.to_s],
+          band: album.band_id.to_s
         },
         title: 'Ride the Lightning',
       }}, res)
