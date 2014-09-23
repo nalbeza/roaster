@@ -15,14 +15,13 @@ module Roaster
         representable_attrs[:_has_one] ||= []
         property name
         representable_attrs[:_has_one].push({key: name.to_s + '_id', name: name.to_s})
-        # byebug
       end
 
       #PING: Overriding build_definition is maybe required
       def has_many(name)
-        property :_links, :inherit => true, :use_decorator => true do
-          collection name, type: :has_many
-        end
+        representable_attrs[:_has_many] ||= []
+        collection name
+        representable_attrs[:_has_many].push({key: name.to_s + '_ids', name: name.to_s})
       end
 
       def can_filter_by(*attrs)
