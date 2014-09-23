@@ -212,13 +212,16 @@ class PoniesTest < MiniTest::Test
   def test_create_with_has_one_links
     album = FactoryGirl.create :album, title: 'Ride the Lightning'
     track_hash = {
-      'title' => 'Fight Fire With Fire',
-      'links' => {
-        'album' => album.id.to_s
+      'tracks' => {
+        'title' => 'Fight Fire With Fire',
+        'links' => {
+          'album' => album.id.to_s
+        }
       }
     }
     target = build_target(:tracks)
     rq = build_request(:create, target: target, document: track_hash)
+    byebug
     res = rq.execute
     assert_json_match({
       tracks: {
