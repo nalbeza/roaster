@@ -115,7 +115,9 @@ class PoniesTest < MiniTest::Test
 
   def test_create_pony
     album_hash = {
-      'title' => 'The Downward Spiral'
+      'albums' => {
+        'title' => 'The Downward Spiral'
+      }
     }
     rq = build_request(:create, document: album_hash)
 
@@ -161,7 +163,9 @@ class PoniesTest < MiniTest::Test
   def test_update_pony
     album = FactoryGirl.create(:album)
     album_update_hash = {
-      'title' => 'Antichrist Superstar'
+      'albums' => {
+        'title' => 'Antichrist Superstar'
+      }
     }
     target = build_target(:albums, album.id)
     rq = build_request(:update, target: target, document: album_update_hash)

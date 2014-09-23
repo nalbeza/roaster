@@ -47,7 +47,7 @@ module Roaster
         obj = @resource.find(@query)
         links = @document.delete('links')
         @resource.update_relationships(@query, links) if links
-        parse(obj, @document)
+        parse(obj, @document) unless @document.empty?
         @resource.save(obj)
       when :delete
         @resource.delete(@query)
@@ -68,6 +68,7 @@ module Roaster
         @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection}, Roaster::JsonApi::CollectionBinding)
       else
         # TODO: HANDLE ERROR ?
+        # raise 'Universe collapsed'
         byebug
       end
     end

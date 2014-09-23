@@ -28,6 +28,10 @@ module Roaster
     class Mapping < ::Roaster::Decorator
       include Representable::JSON
 
+      def from_hash(hash, options = {})
+        super(hash[self.class.get_resource_name], options)
+      end
+
       def to_hash(option)
 
         roaster_type = option[:roaster]
