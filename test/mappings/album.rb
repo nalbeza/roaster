@@ -6,7 +6,6 @@ class AlbumMapping < Roaster::JsonApi::Mapping
 
   has_many :tracks
   has_one :band
-  # property :created_at
 
   # TODO: auto include included mapping
   # Aiming: Nested sparse fieldsets authorizations and default behaviour for sort
@@ -16,7 +15,4 @@ class AlbumMapping < Roaster::JsonApi::Mapping
 
   can_sort_by :band, :title, :created_at, band: [:name]
 
-  # resource_name 'test_lautre'
-
-  collection_representer class: Album
 end

@@ -22,7 +22,6 @@ module Roaster
 
       #TODO: Underscore does not mean private, only `private` does
       #TODO: Please refactor me, i'm ugly
-      # I need the model instance please, i'm hungry
       def _change_relationship(object, rel_name, rel_ids, replace: false)
         #TODO: Refactor model searching
         rel_model = rel_name.to_s.classify.constantize
@@ -80,8 +79,8 @@ module Roaster
         q
       end
 
-      def delete(query)
-        q = scope_for(query.target)
+      def delete(query, model_class: nil)
+        q = scope_for(query.target, model_class)
         q.destroy_all
       end
 

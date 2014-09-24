@@ -7,8 +7,8 @@ module Roaster
       @model_class = opts[:model_class]
     end
 
-    def new(query)
-      @adapter.new(query)
+    def new(query, model_class: @model_class)
+      @adapter.new(query, model_class: model_class)
     end
 
     def save(model)
@@ -17,7 +17,7 @@ module Roaster
     end
 
     def delete(query)
-      @adapter.delete(query)
+      @adapter.delete(query, model_class: @model_class)
     end
 
     def create_relationships(object, rels)
