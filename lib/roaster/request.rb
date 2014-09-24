@@ -66,6 +66,7 @@ module Roaster
         #TODO: Notify caller if the resource itself was updated, or only links, useful for JSONAPI spec (HTTP 200 or 204)
       when :delete
         @resource.delete(@query)
+        nil
       end
     end
 
