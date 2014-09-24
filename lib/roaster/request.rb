@@ -44,6 +44,7 @@ module Roaster
         else
           obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
           @resource.create_relationships(obj, {@query.target.relationship_name => @document})
+          nil
         end
         #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
       when :read
