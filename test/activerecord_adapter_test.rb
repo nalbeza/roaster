@@ -16,6 +16,12 @@ class ActiveRecordAdapterTest < MiniTest::Test
     @albums_target = Roaster::Query::Target.new(:albums)
   end
 
+  def test_model_class_option
+    query = Roaster::Query.new(:read, @albums_target, @album_mapping, {})
+    res = @adapter.new(query, model_class: ::Band)
+    assert_instance_of ::Band, res
+  end
+
   def test_interface
     assert @adapter.respond_to?(:new)
     assert @adapter.respond_to?(:save)
@@ -109,13 +115,6 @@ class ActiveRecordAdapterTest < MiniTest::Test
   end
 
   private
-
-  def call_adapter_method(method,
-                          target,
-                          params = {})
-    query = Roaster::Query.new(method, target, @mapping, params)
-    @adapter.send(method, query)
-  end
 
   def build_query(operation, target = @albums_target, mapping = @album_mapping, params = {})
     Roaster::Query.new(:create, @albums_target, @album_mapping, params)

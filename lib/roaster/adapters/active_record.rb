@@ -9,6 +9,7 @@ module Roaster
         "#{resource_name.to_s.singularize}".classify.constantize
       end
 
+      #TODO: Query shouldn't be here
       def new(query, model_class: nil)
         model = model_for(model_class || query.target.resource_name)
         model.new
@@ -90,7 +91,7 @@ module Roaster
       end
 
       def model_for(model_class_or_name)
-        if model_class_or_name.kind_of?(::ActiveRecord::Base)
+        if model_class_or_name.kind_of?(Class) && model_class_or_name <= ::ActiveRecord::Base
           model_class_or_name
         else
           self.class.model_class_from_resource_name(model_class_or_name)
