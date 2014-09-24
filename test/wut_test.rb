@@ -262,7 +262,6 @@ class PoniesTest < MiniTest::Test
       }}, res)
   end
 
-
   def test_update_to_many_relationship
     track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
     # Track 2 omitted because it has the same title as the album
