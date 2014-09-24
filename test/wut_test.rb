@@ -182,8 +182,8 @@ class PoniesTest < MiniTest::Test
     rq = build_request(:update, target: target, document: album_update_hash)
 
     res = rq.execute
-    assert_equal album.id, res.id
-    assert_equal 'Antichrist Superstar', res.title
+    assert_equal album.id.to_s, res['albums']['id']
+    assert_equal 'Antichrist Superstar', res['albums']['title']
   end
 
   def test_update_to_one_relationship
@@ -199,6 +199,7 @@ class PoniesTest < MiniTest::Test
 
     res = rq.execute
     album.reload
+    assert_nil res
     assert_equal 'Megadeth', album.band.name
   end
 
@@ -279,6 +280,7 @@ class PoniesTest < MiniTest::Test
 
     res = rq.execute
     album.reload
+    assert_nil res
     assert_equal 2, album.tracks.count
     assert_equal Set.new(album.tracks.map(&:id)), Set.new([track_3, track_4].map(&:id))
   end

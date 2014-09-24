@@ -63,6 +63,7 @@ module Roaster
         @resource.update_relationships(obj, links) if links
         parse(obj, @document) unless @document.empty?
         @resource.save(obj)
+        @document.empty? ? nil : represent(obj, singular: true)
         #TODO: Notify caller if the resource itself was updated, or only links, useful for JSONAPI spec (HTTP 200 or 204)
       when :delete
         @resource.delete(@query)
