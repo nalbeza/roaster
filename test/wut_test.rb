@@ -295,8 +295,10 @@ class PoniesTest < MiniTest::Test
     refute Album.exists?(album_id)
   end
 
-  def test
-
+  def test_invalid_single_id
+    target = build_target(:albums, SecureRandom.hex)
+    rq = build_request(:read, target: target)
+    assert_raises(Roaster::ResourceNotFoundError) { rq.execute }
   end
 
 end

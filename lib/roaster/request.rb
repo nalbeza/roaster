@@ -1,4 +1,7 @@
 module Roaster
+
+  class ResourceNotFoundError < StandardError; end
+
   class Request
 
     ALLOWED_OPERATIONS = [:create, :read, :update, :delete]
@@ -56,6 +59,7 @@ module Roaster
           has_one_attrs = @resource_mapping_class.representable_attrs[:_has_one]
           singular = has_one_attrs && has_one_attrs.one? {|h| h[:name] == rel_name }
         end
+        raise ResourceNotFoundError if res.blank? && singular
         represent(res, singular: singular)
       when :update
         obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
