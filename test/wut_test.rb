@@ -36,12 +36,13 @@ class PoniesTest < MiniTest::Test
     Roaster::Query::Target.new(resource_name, resource_ids, relationship_name, relationship_ids)
   end
 
-  def build_request(operation, target: build_target, resource: @ar_resource, params: {}, document: nil)
+  def build_request(operation, target: build_target, resource: @ar_resource, params: {}, document: nil, mapping_class: nil)
     Roaster::Request.new(operation,
                          target,
                          resource,
                          params,
-                         document: document)
+                         document: document,
+                         mapping_class: mapping_class)
   end
 
   def test_single
@@ -55,7 +56,22 @@ class PoniesTest < MiniTest::Test
           'band' => @wages_of_sin_album.band_id.to_s,
           'tracks' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s)
         },
-        'title'=>@wages_of_sin_album.title}
+        'title' => @wages_of_sin_album.title}
+    }, res)
+  end
+
+  def test_aliases
+    target = build_target(:albums, @wages_of_sin_album.id.to_s)
+    rq = build_request(:read, target: target, mapping_class: AliasedAlbumMapping)
+    res = rq.execute
+    assert_equal({
+      'aliased_albums' => {
+        'id' => @wages_of_sin_album.id.to_s,
+        'links' => {
+          'artist' => @wages_of_sin_album.band_id.to_s,
+          'songs' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s)
+        },
+        'name' => @wages_of_sin_album.title}
     }, res)
   end
 

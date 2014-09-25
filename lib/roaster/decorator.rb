@@ -15,17 +15,18 @@ module Roaster
         doc[get_resource_name] || doc
       end
 
-      def has_one(name)
+      def has_one(name, as: name)
         representable_attrs[:_has_one] ||= []
-        property name
-        representable_attrs[:_has_one].push({key: name.to_s + '_id', name: name.to_s})
+        property name, as: as
+        representable_attrs[:_has_one].push({as: as.to_s, key: name.to_s + '_id', name: name.to_s})
       end
 
       #PING: Overriding build_definition is maybe required
-      def has_many(name)
+      def has_many(name, as: name)
+        as = as.to_s
         representable_attrs[:_has_many] ||= []
-        collection name
-        representable_attrs[:_has_many].push({key: name.to_s.singularize + '_ids', name: name.to_s})
+        collection name, as: as
+        representable_attrs[:_has_many].push({as: as.to_s, key: name.to_s.singularize + '_ids', name: name.to_s})
       end
 
       def can_filter_by(*attrs)

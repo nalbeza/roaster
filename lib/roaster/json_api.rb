@@ -33,6 +33,8 @@ module Roaster
         super(hash[self.class.get_resource_name], options)
       end
 
+      #TODO: First stop when refactoring (links should be in definitions, not custom _has_one if possible)
+      # Make roar's _links definition technique work in here
       def to_hash(option)
 
         roaster_type = option[:roaster]
@@ -40,13 +42,13 @@ module Roaster
 
         representable_attrs[:_has_one].each do |link|
           representable_attrs[:definitions].delete(link[:name].to_s)
-          links[link[:name]] = @represented[link[:key]].nil? ? nil : @represented[link[:key]].to_s
+          links[link[:as]] = @represented[link[:key]].nil? ? nil : @represented[link[:key]].to_s
         end unless representable_attrs[:_has_one].nil?
 
 
         representable_attrs[:_has_many].each do |link|
           representable_attrs[:definitions].delete(link[:name].to_s)
-          links[link[:name]] = @represented.send(link[:key]).map(&:to_s) || []
+          links[link[:as]] = @represented.send(link[:key]).map(&:to_s) || []
         end unless representable_attrs[:_has_many].nil?
 
         if roaster_type.nil?

@@ -9,7 +9,10 @@ require_relative 'support/active_record'
 require_relative 'models/album'
 require_relative 'models/band'
 require_relative 'models/track'
+
+#TODO: Autoload those somehow
 require_relative 'mappings/album'
+require_relative 'mappings/aliased_album'
 require_relative 'mappings/band'
 require_relative 'mappings/track'
 
