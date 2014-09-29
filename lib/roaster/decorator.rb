@@ -16,6 +16,7 @@ module Roaster
       end
 
       def has_one(name, as: as, mapping: mapping)
+      #TODO: Maybe store rels in a single hash, preventing conflicts and solving difficult access (add a type key)
         representable_attrs[:_has_one] ||= []
         property name, as: as
         as ||= name
