@@ -13,7 +13,8 @@ module Roaster
       end
       @operation = operation
       @resource = resource
-      @resource_mapping_class = Roaster::Factory.mapping_class_from_name(target.resource_name)
+      #TODO: This shouldnt be here, mapping_class option does not work when getting relationship (returns relationship type, not resource type)
+      @resource_mapping_class = opts[:mapping_class] || Roaster::Factory.mapping_class_from_name(target.resource_name)
       @mapping_class = opts[:mapping_class] || Roaster::Factory.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
@@ -74,7 +75,7 @@ module Roaster
         rname = [:_has_one, :_has_many].map do |k|
           ra = @resource_mapping_class.representable_attrs[k]
           next nil unless ra
-          r = ra.find {|r| r[:name].to_sym == name.to_sym }
+          r = ra.find {|r| r[:as].to_sym == name.to_sym }
           r ? r[:name] : nil
         end.compact.first
         raise "Unknown rel: #{name}" unless rname

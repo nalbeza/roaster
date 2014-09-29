@@ -18,11 +18,7 @@ class PoniesTest < MiniTest::Test
     FactoryGirl.create(:animals_album, band: nil)
     FactoryGirl.create(:the_wall_album, band: nil)
     FactoryGirl.create(:meddle_album, band: nil)
-=begin
- 1 - Enemy Within
- 2 - Burning Angel
- 3 - Heart Of Darkness
-=end
+
     @arch_enemy_band = FactoryGirl.create :band, name: 'Arch Enemy'
     @wages_of_sin_album = FactoryGirl.create :album, title: 'Wages of Sin', band: @arch_enemy_band, tracks: [
       FactoryGirl.create(:track, title: 'Enemy Within'),
@@ -225,6 +221,28 @@ class PoniesTest < MiniTest::Test
     refute_nil res['albums']
     refute_nil res['albums']['id']
     assert_equal 'The Downward Spiral', res['albums']['title']
+  end
+
+  def test_create_aliased
+    song = FactoryGirl.create(:track)
+    artist = FactoryGirl.create(:band)
+    album_hash = {
+      'aliased_albums' => {
+        'name' => 'The Downward Spiral',
+        'links' => {
+          'songs' => [song.id.to_s],
+          'artist' => artist.id.to_s
+        }
+      }
+    }
+    rq = build_request(:create, document: album_hash, mapping_class: AliasedAlbumMapping)
+
+    res = rq.execute
+    refute_nil res['aliased_albums']
+    refute_nil res['aliased_albums']['id']
+    assert_equal song.id.to_s, res['aliased_albums']['links']['songs'].first
+    assert_equal artist.id.to_s, res['aliased_albums']['links']['artist']
+    assert_equal 'The Downward Spiral', res['aliased_albums']['name']
   end
 
   def test_add_to_one_relationship
