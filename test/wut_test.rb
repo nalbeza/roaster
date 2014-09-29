@@ -240,8 +240,8 @@ class PoniesTest < MiniTest::Test
     res = rq.execute
     refute_nil res['aliased_albums']
     refute_nil res['aliased_albums']['id']
-    assert_equal song.id.to_s, res['aliased_albums']['links']['songs'].first
-    assert_equal artist.id.to_s, res['aliased_albums']['links']['artist']
+    assert_equal song.id.to_s, res['aliased_albums']['links']['songs']['ids'].first
+    assert_equal artist.id.to_s, res['aliased_albums']['links']['artist']['id']
     assert_equal 'The Downward Spiral', res['aliased_albums']['name']
   end
 
