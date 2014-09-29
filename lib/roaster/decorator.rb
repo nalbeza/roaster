@@ -15,6 +15,7 @@ module Roaster
         doc[get_resource_name] || doc
       end
 
+      #TODO: Maybe store rels in a single hash, preventing conflicts and solving difficult access (add a type key)
       def has_one(name, as: name)
         representable_attrs[:_has_one] ||= []
         property name, as: as
@@ -23,7 +24,6 @@ module Roaster
 
       #PING: Overriding build_definition is maybe required
       def has_many(name, as: name)
-        as = as.to_s
         representable_attrs[:_has_many] ||= []
         collection name, as: as
         representable_attrs[:_has_many].push({as: as.to_s, key: name.to_s.singularize + '_ids', name: name.to_s})

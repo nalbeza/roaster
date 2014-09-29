@@ -40,21 +40,10 @@ module Roaster
         self.save(object)
       end
 
-      def _change_relationships(object, rels, replace: false)
+      def change_relationships(object, rels, replace: false)
         rels.each do |name, v|
           _change_relationship(object, name, v, replace: replace)
         end
-      end
-
-      #TODO:
-      # Document key isn't always rel_name, it's rel_name's resource type
-      #   ( not accessible here right now :-( )
-      def create_relationships(object, rels)
-        _change_relationships(object, rels)
-      end
-
-      def update_relationships(object, rels)
-        _change_relationships(object, rels, replace: true)
       end
 
       def find(res_name, res_ids, model_class: nil)

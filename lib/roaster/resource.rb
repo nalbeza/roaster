@@ -20,12 +20,8 @@ module Roaster
       @adapter.delete(query, model_class: @model_class)
     end
 
-    def create_relationships(object, rels)
-      @adapter.create_relationships(object, rels)
-    end
-
-    def update_relationships(object, rels)
-      @adapter.update_relationships(object, rels)
+    def change_relationships(object, rels, replace: false)
+      @adapter.change_relationships(object, rels, replace: replace)
     end
 
     def find(res_name, res_ids)

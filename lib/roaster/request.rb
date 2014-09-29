@@ -20,7 +20,6 @@ module Roaster
     end
 
     def initialize(operation, target, resource, params, opts = {})
-      # :create, :read, :update, :delete
       unless ALLOWED_OPERATIONS.include?(operation)
         raise "#{operation} is not a valid operation."
       end
@@ -29,7 +28,6 @@ module Roaster
       @resource_mapping_class = self.class.mapping_class_from_name(target.resource_name)
       @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
-      #TODO: Oh snap this is confusing
       @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
     end
 
@@ -42,11 +40,11 @@ module Roaster
           parse(obj, @document)
           #TODO: Allow rel creation before saving (has_one requires a single update query)
           res = @resource.save(obj)
-          @resource.create_relationships(obj, links) if links
+          change_relationships(obj, links) if links
           represent(res, singular: true)
         else
           obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
-          @resource.create_relationships(obj, {@query.target.relationship_name => @document})
+          change_relationships(obj, {@query.target.relationship_name => @document})
           nil
         end
         #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
@@ -64,7 +62,7 @@ module Roaster
       when :update
         obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
         links = @document.delete('links')
-        @resource.update_relationships(obj, links) if links
+        change_relationships(obj, links, replace: true) if links
         parse(obj, @document) unless @document.empty?
         @resource.save(obj)
         @document.empty? ? nil : represent(obj, singular: true)
@@ -76,6 +74,25 @@ module Roaster
     end
 
     private
+
+    def change_relationships(obj, rels, replace: false)
+      rels = resolve_relationships(rels)
+      @resource.change_relationships(obj, rels, replace: replace)
+    end
+
+    #TODO: Move/fix this (mapping should expose some clean way to inspect relationships) !
+    def resolve_relationships(rels)
+      Hash[rels.map do |name, v|
+        rname = [:_has_one, :_has_many].map do |k|
+          ra = @resource_mapping_class.representable_attrs[k]
+          next nil unless ra
+          r = ra.find {|r| r[:name].to_sym == name.to_sym }
+          r ? r[:name] : nil
+        end.compact.first
+        raise "Unknown rel: #{name}" unless rname
+        [rname, v]
+      end]
+    end
 
     def parse(object, data)
       rp = @mapping_class.new(object)
