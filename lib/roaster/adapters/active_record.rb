@@ -40,9 +40,8 @@ module Roaster
       #TODO: Please refactor me, i'm ugly
       def _change_relationship(object, rel_name, rel_ids, replace: false)
         #TODO: Refactor model searching
-        rel_model = rel_name.to_s.classify.constantize
         rel_meta = object.class.reflect_on_association(rel_name)
-        rel_object = rel_model.find(rel_ids)
+        rel_object = rel_meta.klass.find(rel_ids)
         case rel_meta.macro
         when :has_many
           object.send(rel_name).clear if replace === true
