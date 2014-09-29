@@ -6,18 +6,6 @@ module Roaster
 
     ALLOWED_OPERATIONS = [:create, :read, :update, :delete]
 
-    #TODO: Move this elsewhere (factory)
-    def self.mapping_class_from_target(target)
-      if target.relationship_name
-        mapping_class_from_name(target.relationship_name)
-      else
-        mapping_class_from_name(target.resource_name)
-      end
-    end
-
-    def self.mapping_class_from_name(name)
-      "#{name.to_s.singularize}_mapping".classify.constantize
-    end
 
     def initialize(operation, target, resource, params, opts = {})
       unless ALLOWED_OPERATIONS.include?(operation)
@@ -26,8 +14,8 @@ module Roaster
       @operation = operation
       @resource = resource
       #TODO: This shouldnt be here, mapping_class option does not work when getting relationship (returns relationship type, not resource type)
-      @resource_mapping_class = opts[:mapping_class] || self.class.mapping_class_from_name(target.resource_name)
-      @mapping_class = opts[:mapping_class] || self.class.mapping_class_from_target(target)
+      @resource_mapping_class = opts[:mapping_class] || Roaster::Factory.mapping_class_from_name(target.resource_name)
+      @mapping_class = opts[:mapping_class] || Roaster::Factory.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
     end
@@ -102,11 +90,12 @@ module Roaster
 
     def represent(data, singular: false)
       if singular && data.respond_to?(:first)
-        @mapping_class.prepare(data.first).to_hash({roaster: :resource})
+        @mapping_class.prepare(data.first).to_hash({roaster: :resource, resource: @resource})
       elsif data.respond_to?(:each)
-        @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection}, Roaster::JsonApi::CollectionBinding)
+        @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection, resource: @resource},
+          Roaster::JsonApi::CollectionBinding)
       else
-        @mapping_class.prepare(data).to_hash({roaster: :resource})
+        @mapping_class.prepare(data).to_hash({roaster: :resource, resource: @resource})
       end
     end
 

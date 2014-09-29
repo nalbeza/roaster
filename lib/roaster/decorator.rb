@@ -15,18 +15,20 @@ module Roaster
         doc[get_resource_name] || doc
       end
 
+      def has_one(name, as: as, mapping: mapping)
       #TODO: Maybe store rels in a single hash, preventing conflicts and solving difficult access (add a type key)
-      def has_one(name, as: name)
         representable_attrs[:_has_one] ||= []
         property name, as: as
-        representable_attrs[:_has_one].push({as: as.to_s, key: name.to_s + '_id', name: name.to_s})
+        as ||= name
+        representable_attrs[:_has_one].push({as: as, name: name, mapping: mapping })
       end
 
       #PING: Overriding build_definition is maybe required
-      def has_many(name, as: name)
+      def has_many(name, as: as, mapping: mapping)
         representable_attrs[:_has_many] ||= []
         collection name, as: as
-        representable_attrs[:_has_many].push({as: as.to_s, key: name.to_s.singularize + '_ids', name: name.to_s})
+        as ||= name
+        representable_attrs[:_has_many].push({as: as,  name: name, mapping: mapping})
       end
 
       def can_filter_by(*attrs)

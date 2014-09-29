@@ -2,6 +2,10 @@ module Roaster
 
   class Resource
 
+    def adapter
+      @adapter
+    end
+
     def initialize(adapter_class, opts = {})
       @adapter = adapter_class.new
       @model_class = opts[:model_class]

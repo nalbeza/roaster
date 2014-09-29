@@ -24,6 +24,8 @@ class PoniesTest < MiniTest::Test
       FactoryGirl.create(:track, title: 'Enemy Within'),
       FactoryGirl.create(:track, title: 'Burning Angel'),
       FactoryGirl.create(:track, title: 'Heart Of Darkness')
+    ], bonus_tracks: [
+      FactoryGirl.create(:track, title: 'mystery')
     ]
     @ar_resource = Roaster::Resource.new(Roaster::Adapters::ActiveRecord)
   end
@@ -49,8 +51,18 @@ class PoniesTest < MiniTest::Test
       'albums' => {
         'id' => @wages_of_sin_album.id.to_s,
         'links' => {
-          'band' => @wages_of_sin_album.band_id.to_s,
-          'tracks' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s)
+          'band' => {
+            'id' => @wages_of_sin_album.band_id.to_s,
+            'type' => 'bands'
+            },
+          'tracks' => {
+            'ids' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s),
+            'type' => 'tracks'
+            },
+          'bonus_tracks'=> {
+            'ids'=> @wages_of_sin_album.bonus_tracks.map(&:id).map(&:to_s),
+            'type'=>'tracks'
+          }
         },
         'title' => @wages_of_sin_album.title}
     }, res)
@@ -64,8 +76,14 @@ class PoniesTest < MiniTest::Test
       'aliased_albums' => {
         'id' => @wages_of_sin_album.id.to_s,
         'links' => {
-          'artist' => @wages_of_sin_album.band_id.to_s,
-          'songs' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s)
+          'artist' => {
+            'id' => @wages_of_sin_album.band_id.to_s,
+            'type' => 'bands'
+          },
+          'songs' => {
+            'ids' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s),
+            'type' => 'tracks'
+          }
         },
         'name' => @wages_of_sin_album.title}
     }, res)
@@ -75,10 +93,11 @@ class PoniesTest < MiniTest::Test
     rq = build_request(:read)
     res = rq.execute
     assert_equal({'albums' => [
-      {'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'},
-      {'id' => '2', 'links'=>{'band' => nil,'tracks'=>[]}, 'title' => 'The Wall'},
-      {'id' => '3', 'links'=>{'band' => nil,'tracks'=>[]}, 'title' => 'Meddle'},
-      {'id' => '4', 'links'=>{'band' => @wages_of_sin_album.band_id.to_s,'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]}, res)
+      {'id' => '1', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'}  }, 'title' => 'Animals'},
+      {'id' => '2', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'}  }, 'title' => 'The Wall'},
+      {'id' => '3', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'}  }, 'title' => 'Meddle'},
+      {'id' => '4', 'links'=>{'band' => { 'type' => 'bands', 'id' => @wages_of_sin_album.band_id.to_s }, 'tracks'=>{ 'type' => 'tracks', 'ids' => ['1', '2', '3']}, 'bonus_tracks'=>{'ids'=>['4'], 'type'=>'tracks'} }, 'title' => 'Wages of Sin'}]},
+      res)
   end
 
    def test_sorted_ponies
@@ -86,10 +105,10 @@ class PoniesTest < MiniTest::Test
     rq = build_request(:read, params: params)
     res = rq.execute
     assert_equal({'albums' => [
-        {'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'},
-        {'id' => '3', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Meddle'},
-        {'id' => '2', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'The Wall'},
-        {'id' => '4', 'links'=>{'band' => @wages_of_sin_album.band_id.to_s, 'tracks'=>['1', '2', '3']}, 'title' => 'Wages of Sin'}]},
+        {'id' => '1', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'} }, 'title' => 'Animals'},
+        {'id' => '3', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'} }, 'title' => 'Meddle'},
+        {'id' => '2', 'links'=>{'band' => { 'type' => 'bands', 'id' => nil}, 'tracks' => { 'type' => 'tracks', 'ids' => []},'bonus_tracks'=>{'ids'=>[], 'type'=>'tracks'} }, 'title' => 'The Wall'},
+        {'id' => '4', 'links'=>{'band' => { 'type' => 'bands', 'id' => @wages_of_sin_album.band_id.to_s }, 'tracks'=>{ 'type' => 'tracks', 'ids' => ['1', '2', '3']}, 'bonus_tracks'=>{'ids'=>['4'], 'type'=>'tracks'} }, 'title' => 'Wages of Sin'}]},
       res)
   end
 
@@ -97,7 +116,22 @@ class PoniesTest < MiniTest::Test
     params = {title: 'Animals'}
     rq = build_request(:read, params: params)
     res = rq.execute
-    assert_equal({'albums' => [{'id' => '1', 'links'=>{'band' => nil, 'tracks'=>[]}, 'title' => 'Animals'}]}, res)
+    assert_equal({'albums' => [{'id' => '1',
+      'links' => {
+        'band' => {
+          'id' => nil,
+          'type' => 'bands'
+          },
+        'tracks' => {
+          'ids'=>[],
+          'type'=>'tracks'
+          },
+        'bonus_tracks' => {
+          'ids'=>[],
+          'type'=>'tracks'
+          }
+        },
+      'title' => 'Animals'}]}, res)
   end
 
   #TODO: Make this one pass !
@@ -125,12 +159,52 @@ class PoniesTest < MiniTest::Test
   def test_read_to_many_relationship
     target = build_target(:albums, @wages_of_sin_album.id.to_s, :tracks)
     rq = build_request(:read, target: target)
+    # byebug
     res = rq.execute
     assert_equal({
       'tracks'=> [
-        {'id'=>'1', 'title' => 'Enemy Within', 'links' => {'album' => @wages_of_sin_album.id.to_s} },
-        {'id'=>'2', 'title' => 'Burning Angel', 'links' => {'album' => @wages_of_sin_album.id.to_s} },
-        {'id'=>'3', 'title' => 'Heart Of Darkness', 'links' => {'album' => @wages_of_sin_album.id.to_s} }
+        {
+          'id'=>'1',
+          'title' => 'Enemy Within',
+          'links' => {
+            'album' => {
+              'id' => @wages_of_sin_album.id.to_s,
+              'type' => 'albums'
+              },
+            'album_as_bonus' => {
+              'id' => nil,
+              'type' => 'albums'
+            }
+          }
+        },
+        {
+          'id'=>'2',
+          'title' => 'Burning Angel',
+          'links' => {
+            'album' => {
+              'id' => @wages_of_sin_album.id.to_s,
+              'type' => 'albums'
+              },
+            'album_as_bonus' => {
+              'id' => nil,
+              'type' => 'albums'
+            }
+          }
+        },
+        {
+          'id'=>'3',
+          'title' => 'Heart Of Darkness',
+          'links' => {
+            'album' => {
+              'id' => @wages_of_sin_album.id.to_s,
+              'type' => 'albums'
+              },
+            'album_as_bonus' => {
+              'id' => nil,
+              'type' => 'albums'
+            }
+          }
+        }
       ]
     }, res)
   end
@@ -245,9 +319,16 @@ class PoniesTest < MiniTest::Test
     res = rq.execute
     assert_json_match({
       tracks: {
-        id: '4',
+        id: track.id.to_s,
         links: {
-          album: '5'
+          album: {
+            id: album.id.to_s,
+            type: 'albums'
+            },
+          album_as_bonus: {
+            id: nil,
+            type: 'albums'
+          }
         },
         title: 'Fight Fire With Fire',
       }}, res)
@@ -267,17 +348,26 @@ class PoniesTest < MiniTest::Test
     target = build_target(:tracks)
     rq = build_request(:create, target: target, document: track_hash)
     res = rq.execute
+    # byebug
     assert_json_match({
       tracks: {
-        id: '4',
+        id: '5',
         links: {
-          album: '5'
+          album: {
+            'id' => album.id.to_s,
+            'type' => 'albums'
+          },
+          'album_as_bonus' => {
+            'id' => nil,
+            'type' => 'albums'
+          }
         },
         title: 'Fight Fire With Fire',
       }}, res)
   end
 
   def test_read_has_many_links
+    # byebug
     track_1 = FactoryGirl.create :track, title: 'Fight Fire With Fire'
     # Track 2 omitted because it has the same title as the album
     track_3 = FactoryGirl.create :track, title: 'For Whom The Bell Tolls'
@@ -290,8 +380,18 @@ class PoniesTest < MiniTest::Test
       albums: {
         id: '5',
         links: {
-          tracks: [track_1.id.to_s, track_3.id.to_s, track_4.id.to_s],
-          band: album.band_id.to_s
+          tracks: {
+            ids: [track_1.id.to_s, track_3.id.to_s, track_4.id.to_s],
+            type: 'tracks'
+            },
+          band: {
+            id: album.band_id.to_s,
+            type: 'bands'
+            },
+          bonus_tracks: {
+            ids: [],
+            type: 'tracks'
+          }
         },
         title: 'Ride the Lightning',
       }}, res)

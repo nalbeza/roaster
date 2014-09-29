@@ -2,6 +2,7 @@ require 'representable'
 require 'representable/json'
 
 require 'roaster/adapters/active_record'
+require 'roaster/factory'
 require 'roaster/decorator'
 require 'roaster/json_api'
 require 'roaster/query'

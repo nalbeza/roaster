@@ -12,4 +12,5 @@ end
 class Album < ActiveRecord::Base
   belongs_to :band
   has_many :tracks
+  has_many :bonus_tracks, class_name: :Track, foreign_key: :album_as_bonus_id
 end
