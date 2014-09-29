@@ -18,6 +18,10 @@ module Roaster
         def one_linked_id(resource, link_name)
           resource.send(link_name.to_s + '_id') ? resource.send(link_name.to_s. + '_id').to_s : nil
         end
+
+        def linked(resource, link_name)
+          resource.send(link_name.to_s)
+        end
       end
 
       #TODO: Query shouldn't be here
@@ -67,7 +71,7 @@ module Roaster
       def read(query, model_class: nil)
         q = scope_for(query.target, model_class)
         query.includes.each do |i|
-          q = q.include(i)
+          q = q.includes(i)
         end
         query.filters.each_pair do |k, v|
           q = q.where(k => v)
