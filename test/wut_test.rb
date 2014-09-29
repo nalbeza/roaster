@@ -110,6 +110,54 @@ class PoniesTest < MiniTest::Test
      }, res)
   end
 
+ def test_single_with_many_includes
+    target = build_target(:albums, @wages_of_sin_album.id.to_s)
+    params = {:include => 'tracks,band'}
+    rq = build_request(:read, target: target, params: params)
+    res = rq.execute
+    assert_equal({
+      'albums' => {
+        'id' => @wages_of_sin_album.id.to_s,
+        'links' => {
+          'band' => {
+            'id' => @wages_of_sin_album.band_id.to_s,
+            'type' => 'bands'
+            },
+          'tracks' => {
+            'ids' => @wages_of_sin_album.tracks.map(&:id).map(&:to_s),
+            'type' => 'tracks'
+            },
+          'bonus_tracks'=> {
+            'ids'=> @wages_of_sin_album.bonus_tracks.map(&:id).map(&:to_s),
+            'type'=>'tracks'
+          }
+        },
+        'title' => @wages_of_sin_album.title
+      },
+      'linked'=> {
+        'tracks'=> [
+          {
+            'id'=>'1', 'links'=>{'album'=>{'id'=>'4', 'type'=>'albums'},
+            'album_as_bonus'=>{'id'=>nil, 'type'=>'albums'}},
+            'title'=>'Enemy Within'},
+          {
+            'id'=>'2', 'links'=>{'album'=>{'id'=>'4', 'type'=>'albums'},
+            'album_as_bonus'=>{'id'=>nil, 'type'=>'albums'}},
+            'title'=>'Burning Angel'},
+          {
+            'id'=>'3', 'links'=>{'album'=>{'id'=>'4', 'type'=>'albums'},
+            'album_as_bonus'=>{'id'=>nil, 'type'=>'albums'}},
+            'title'=>'Heart Of Darkness'}
+          ],
+       'bands' => [
+        {
+          'id'=>'1',
+          'name' => 'Arch Enemy'
+        }
+       ]
+      }
+    }, res)
+  end
 
   def test_aliases
     target = build_target(:albums, @wages_of_sin_album.id.to_s)
