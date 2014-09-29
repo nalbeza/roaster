@@ -5,6 +5,7 @@ class AlbumMapping < Roaster::JsonApi::Mapping
   property :title
 
   has_many :tracks
+  has_many :bonus_tracks, mapping: :track
   has_one :band
 
   # TODO: auto include included mapping

@@ -5,8 +5,19 @@ module Roaster
 
     class ActiveRecord
 
-      def self.model_class_from_resource_name(resource_name)
-        "#{resource_name.to_s.singularize}".classify.constantize
+      class << self
+        def model_class_from_resource_name(resource_name)
+          "#{resource_name.to_s.singularize}".classify.constantize
+        end
+
+        def many_linked_ids(resource, link_name)
+          # byebug
+          (resource.send(link_name.to_s.singularize + '_ids') || []).map(&:to_s)
+        end
+
+        def one_linked_id(resource, link_name)
+          resource.send(link_name.to_s + '_id') ? resource.send(link_name.to_s. + '_id').to_s : nil
+        end
       end
 
       #TODO: Query shouldn't be here

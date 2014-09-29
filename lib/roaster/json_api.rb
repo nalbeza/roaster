@@ -30,25 +30,32 @@ module Roaster
 
       def from_hash(hash, options = {})
         return super
-        super(hash[self.class.get_resource_name], options)
       end
 
       #TODO: First stop when refactoring (links should be in definitions, not custom _has_one if possible)
       # Make roar's _links definition technique work in here
       def to_hash(option)
-
         roaster_type = option[:roaster]
+        @resource = option[:resource]
         links = {}
 
         representable_attrs[:_has_one].each do |link|
           representable_attrs[:definitions].delete(link[:name].to_s)
-          links[link[:as]] = @represented[link[:key]].nil? ? nil : @represented[link[:key]].to_s
+          mapping_class = Roaster::Factory.mapping_class_from_name((link[:mapping] || link[:name]).to_s.pluralize)
+          links[link[:as].to_s] = {
+            'id' => @resource.adapter.class.one_linked_id(@represented, link[:name]),
+            'type' => mapping_class.get_resource_name
+          }
         end unless representable_attrs[:_has_one].nil?
 
 
         representable_attrs[:_has_many].each do |link|
           representable_attrs[:definitions].delete(link[:name].to_s)
-          links[link[:as]] = @represented.send(link[:key]).map(&:to_s) || []
+          mapping_class = Roaster::Factory.mapping_class_from_name((link[:mapping] || link[:name]).to_s.pluralize)
+          links[link[:as].to_s] = {
+            'ids' => @resource.adapter.class.many_linked_ids(@represented, link[:name]),
+            'type' => mapping_class.get_resource_name
+          }
         end unless representable_attrs[:_has_many].nil?
 
         if roaster_type.nil?

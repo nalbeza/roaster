@@ -9,7 +9,7 @@ class RequestTest < MiniTest::Test
 
   def test_mapping_class_from_target
     target = Roaster::Query::Target.new(:albums)
-    mc = Roaster::Request.mapping_class_from_target(target)
+    mc = Roaster::Factory.mapping_class_from_target(target)
     assert_equal AlbumMapping, mc
   end
 
