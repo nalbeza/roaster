@@ -45,8 +45,11 @@ module Roaster
         case rel_meta.macro
         when :has_many
           #May be useful someday: rel_meta.options.has_key?(:through)
-          object.send(rel_name).destroy_all if replace === true
-          object.send(rel_name).push(rel_object)
+          if replace === true
+            object.send(rel_name).replace(rel_object)
+          else
+            object.send(rel_name).push(rel_object)
+          end
         when :belongs_to
           object.send("#{rel_name}=", rel_object)
         else
