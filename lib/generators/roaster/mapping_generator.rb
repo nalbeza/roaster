@@ -18,6 +18,7 @@ module Roaster
       rel_lut = {has_many: :has_many, has_one: :has_one, belongs_to: :has_one}
       relationships = model.reflect_on_all_associations
       @relationships = relationships.select {|a| rel_lut.has_key?(a.macro) }.group_by {|a| rel_lut[a.macro] }
+      path = File.join(output_path, "#{name}.rb")
       template('mapping.erb', "app/api/vidzit/mappings/#{name}.rb")
     end
 
