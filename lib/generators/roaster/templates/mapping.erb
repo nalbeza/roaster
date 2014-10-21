@@ -1,11 +1,10 @@
-class <%= name.camelize %>Mapping < Grape::JsonApi::Mapping
-  <% @properties.each do |prop| %>
-    property <%= ":#{prop}" -%>
-  <% end -%>
+class <%= name.camelize %>Mapping < Roaster::JsonApi::Mapping
   <% @relationships.each do |rel_type, rels| %>
   <% rels.each do |prop| %>
     <%= "#{rel_type} :#{prop.name}" -%>
   <% end -%>
   <% end %>
-
+  <% @properties.each do |prop| %>
+    property <%= ":#{prop}" -%>
+  <% end -%>
 end
