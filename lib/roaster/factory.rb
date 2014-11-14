@@ -3,10 +3,11 @@ module Roaster
     class << self
       def mapping_class_from_target(target)
         resource_mapping = mapping_class_from_name(target.resource_name)
-        if target.relationship_name
+        rel_name = target.relationship_name
+        if rel_name
           all_rels = resource_mapping.representable_attrs.values_at(:_has_many, :_has_one).flatten.compact
           r = all_rels.find {|r| r[:as].to_sym == name.to_sym }
-          rel_name = r && r[:mapping] ? r[:mapping] : target.relationship_name
+          rel_name = r[:mapping] if r && r[:mapping]
           mapping_class_from_name(rel_name)
         else
           resource_mapping
