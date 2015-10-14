@@ -16,7 +16,7 @@ module Roaster
         end
 
         def one_linked_id(resource, link_name)
-          fk = resource.class.reflections[link_name].foreign_key
+          fk = resource.class.reflections[link_name.to_s].foreign_key
           resource.send(fk) ? resource.send(fk).to_s : nil
         end
 

@@ -17,8 +17,8 @@ Gem::Specification.new do |gem|
   gem.version       = Roaster::VERSION
 
   gem.add_runtime_dependency "representable", "~> 2.0.4"
-  gem.add_runtime_dependency "activerecord", "~> 4.1"
-  gem.add_runtime_dependency "activesupport", "~> 4.1"
+  gem.add_runtime_dependency "activerecord", "~> 4.2.1"
+  gem.add_runtime_dependency "activesupport", "~> 4.2.1"
 
   gem.add_development_dependency 'minitest', '~> 5.1'
   gem.add_development_dependency 'rake', '~> 10.3'
