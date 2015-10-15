@@ -72,8 +72,8 @@ module Roaster
         model_class.find(res_ids.size == 1 ? res_ids.first : res_ids)
       end
 
-      def read(query, model_class: nil)
-        q = scope_for(query.target, model_class)
+      def read(query, model_class: nil, scope: nil)
+        q = scope_for(query.target, model_class, scope)
         query.includes.each do |i|
           q = q.includes(i)
         end
@@ -108,9 +108,15 @@ module Roaster
 
       #TODO: Handle ALL, none should be the default: maybe not ?
       # Move resource stuff into resource_for
-      def scope_for(target, model_class_or_name = nil)
+      def scope_for(target, model_class_or_name = nil, forced_scope = nil)
         model_class = model_for(model_class_or_name || target.resource_name)
         scope = model_class.all
+        if forced_scope && forced_scope[:joins]
+          scope = scope.includes(forced_scope[:joins])
+        end
+        if forced_scope && forced_scope[:condition]
+          scope = scope.where(forced_scope[:condition])
+        end
         unless target.resource_ids.empty?
           scope = scope.where(id: target.resource_ids)
         end

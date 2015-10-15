@@ -18,6 +18,7 @@ module Roaster
       @mapping_class = opts[:mapping_class] || Roaster::Factory.mapping_class_from_target(target)
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
+      @api_key = opts[:api_key]
     end
 
     def execute
@@ -38,7 +39,7 @@ module Roaster
         end
         #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
       when :read
-        res = @resource.query(@query)
+        res = @resource.query(@query, api_key: @api_key)
         target = @query.target
         rel_name = target.relationship_name
         singular = target.resource_ids.size == 1 && rel_name.nil?
