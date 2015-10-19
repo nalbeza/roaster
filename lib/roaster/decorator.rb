@@ -54,6 +54,10 @@ module Roaster
         representable_attrs[:_sortable_attributes].push(*sort_keys).uniq!
       end
 
+      def paginate(per_page: 25)
+        representable_attrs[:_per_page] = per_page
+      end
+
       def sortable_attributes
         representable_attrs[:_sortable_attributes] ||= []
         representable_attrs[:_sortable_attributes]

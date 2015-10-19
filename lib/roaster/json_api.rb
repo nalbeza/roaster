@@ -16,7 +16,7 @@ module Roaster
         collection = value.collect { |item|
           super(item)
         }
-        { @mapping_class.get_resource_name => collection }
+        { 'data' => collection }
       end
 
       # TODO
@@ -33,7 +33,7 @@ module Roaster
       end
 
       def linked(option, has_one, has_many)
-        linked = {}
+        linked = []
         option[:query].includes.each do |inc|
           link = has_one[inc] if has_one[inc]
           link = has_many[inc] if has_many[inc]
@@ -41,16 +41,12 @@ module Roaster
           raise "{Error: #{inc.to_s} is includeable but cannot be found in your has_many or has_one relationships.}" if link.nil?
           mapping_class = Roaster::Factory.mapping_class_from_name((link[:mapping] || link[:name]).to_s.pluralize)
           if has_one[inc]
-            linked[has_one[inc][:type]] ||= Set.new
-            linked[has_one[inc][:type]].merge [mapping_class.prepare(@adapter_class.linked(@represented, link[:name])).to_hash({roaster: :resource, adapter_class: @adapter_class, query: nil, resource_namespace: inc.to_s})[has_one[inc][:type]]]
+            linked << mapping_class.prepare(@adapter_class.linked(@represented, link[:name])).to_hash({roaster: :resource, adapter_class: @adapter_class, query: nil, resource_namespace: inc.to_s})[:data]
           elsif has_many[inc]
-            linked[has_many[inc][:type]] ||= Set.new
-            linked[has_many[inc][:type]].merge mapping_class.for_collection.prepare(@adapter_class.linked(@represented, link[:name])).to_hash({roaster: :collection, adapter_class: @adapter_class, query: nil, resource_namespace: inc.to_s})
+            linked.concat mapping_class.for_collection.prepare(@adapter_class.linked(@represented, link[:name])).to_hash({roaster: :collection, adapter_class: @adapter_class, query: nil, resource_namespace: inc.to_s})
           end
         end
-        linked.each do |k, v|
-          linked[k] = v.to_a
-        end
+        linked
       end
 
       #TODO: First stop when refactoring (links should be in definitions, not custom _has_one if possible)
@@ -66,8 +62,10 @@ module Roaster
           representable_attrs[:definitions].delete(link[:name].to_s)
           mapping_class = Roaster::Factory.mapping_class_from_name((link[:mapping] || link[:name]).to_s.pluralize)
           links[link[:as].to_s] = {
-            'id' => @adapter_class.one_linked_id(@represented, link[:name]),
-            'type' => mapping_class.get_resource_name
+            'data' => {
+              'type' => mapping_class.get_resource_name,
+              'id' => @adapter_class.one_linked_id(@represented, link[:name])
+            }
           }
           has_one[link[:as]] = {
             :type => mapping_class.get_resource_name,
@@ -81,9 +79,13 @@ module Roaster
           representable_attrs[:definitions].delete(link[:name].to_s)
           mapping_class = Roaster::Factory.mapping_class_from_name((link[:mapping] || link[:name]).to_s.pluralize)
           links[link[:as].to_s] = {
-            'ids' => @adapter_class.many_linked_ids(@represented, link[:name]),
-            'type' => mapping_class.get_resource_name
-          }
+            'data' => @adapter_class.many_linked_ids(@represented, link[:name]).map { |id|
+              {
+                'type' => mapping_class.get_resource_name,
+                'id' => id
+              }
+            }
+         }
           has_many[link[:as]] = {
             :type => mapping_class.get_resource_name,
             :name => link[:name],
@@ -94,21 +96,24 @@ module Roaster
         if roaster_type.nil?
           resource_id.to_s
         else
-          sup = {'id' => resource_id.to_s }
-          sup.merge!({'links' => links }) unless links.empty?
+          sup = {'type' => self.class.get_resource_name}
+          sup.merge!({'id' => resource_id.to_s })
+          attributes = super(option)
+          sup.merge!({'attributes' => attributes}) unless attributes.empty?
+          sup.merge!({'relationships' => links }) unless links.empty?
           wrapper = {}
           if option[:query] && option[:query].includes && option[:query].includes.size > 0
             wrapper.merge!({
-              'linked' => linked(option, has_one, has_many) #TODO HERE
+              'included' => linked(option, has_one, has_many) #TODO HERE
             })
           end
           case roaster_type
             when :resource
               {
-                self.class.get_resource_name => sup.merge(super(option))
+                data: sup
               }.merge! wrapper
             when :collection
-              sup.merge(super(option))
+              sup
           end
         end
       end
