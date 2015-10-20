@@ -110,7 +110,7 @@ module Roaster
               'type' => mapping_class.get_resource_name,
               'id' => @adapter_class.one_linked_id(@represented, link[:name]),
               'links' => {
-                'self' =>  @root_url + '/' + mapping_class.get_resource_name + '/' + id.to_s
+                'self' =>  @root_url + '/' + mapping_class.get_resource_name + '/' + @adapter_class.one_linked_id(@represented, link[:name])
               }
             }
           }
