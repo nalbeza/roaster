@@ -126,7 +126,10 @@ module Roaster
             'data' => @adapter_class.many_linked_ids(@represented, link[:name]).map { |id|
               {
                 'type' => mapping_class.get_resource_name,
-                'id' => id
+                'id' => id.to_s,
+                'links' => {
+                  'self' =>  @root_url + '/' + mapping_class.get_resource_name + '/' + id.to_s
+                }
               }
             }
          }
