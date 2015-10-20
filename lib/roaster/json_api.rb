@@ -108,7 +108,10 @@ module Roaster
           links[link[:as].to_s] = {
             'data' => {
               'type' => mapping_class.get_resource_name,
-              'id' => @adapter_class.one_linked_id(@represented, link[:name])
+              'id' => @adapter_class.one_linked_id(@represented, link[:name]),
+              'links' => {
+                'self' =>  @root_url + '/' + mapping_class.get_resource_name + '/' + id.to_s
+              }
             }
           }
           has_one[link[:as]] = {
