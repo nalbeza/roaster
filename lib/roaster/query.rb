@@ -56,10 +56,12 @@ module Roaster
     end
 
     def filters_as_url_params
+      return nil if @filters.blank?
       @filters.sort.map { |k,v| map_filter_ids(k,v) }.join('&')
     end
 
     def sorting_as_url_params
+      return nil if sorting.blank? || sorting[@target.resource_name].blank?
       sorting_values = sorting[@target.resource_name].map { |k, v| v == :asc ? k : "-#{k}" }.join(',')
       "sort=#{sorting_values}"
     end
