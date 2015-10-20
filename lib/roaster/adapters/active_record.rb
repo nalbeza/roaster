@@ -23,6 +23,14 @@ module Roaster
         def linked(resource, link_name)
           resource.send(link_name.to_s)
         end
+
+        def collection_size(collection)
+          collection.count
+        end
+
+        def paginate_collection(collection, page, page_size)
+          collection.offset(page * page_size).limit(page_size)
+        end
       end
 
       #TODO: Query shouldn't be here

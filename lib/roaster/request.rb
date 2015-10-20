@@ -19,6 +19,7 @@ module Roaster
       @query = Roaster::Query.new(@operation, target, @mapping_class, params)
       @document = opts[:document] ? @mapping_class.strip(opts[:document]) : {}
       @api_key = opts[:api_key]
+      @root_url = opts[:root_url]
     end
 
     def execute
@@ -91,12 +92,12 @@ module Roaster
 
     def represent(data, singular: false)
       if singular && data.respond_to?(:first)
-        @mapping_class.prepare(data.first).to_hash({roaster: :resource, adapter_class: @resource.adapter.class, query: @query})
+        @mapping_class.prepare(data.first).to_hash({roaster: :resource, adapter_class: @resource.adapter.class, query: @query, root_url: @root_url})
       elsif data.respond_to?(:each)
-        @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection, adapter_class: @resource.adapter.class, query: @query},
+        @mapping_class.for_collection.prepare(data).to_hash({roaster: :collection, adapter_class: @resource.adapter.class, query: @query, root_url: @root_url},
           Roaster::JsonApi::CollectionBinding)
       else
-        @mapping_class.prepare(data).to_hash({roaster: :resource, adapter_class: @resource.adapter.class, query: @query})
+        @mapping_class.prepare(data).to_hash({roaster: :resource, adapter_class: @resource.adapter.class, query: @query, root_url: @root_url})
       end
     end
 

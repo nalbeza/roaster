@@ -27,7 +27,8 @@ module Roaster
                   :operation
 
     #TODO: Move in config class
-    DEFAULT_PAGE_SIZE = 10
+    DEFAULT_PAGE_SIZE = 25
+    DEFAULT_MAX_PAGE_SIZE = 100
     OPERATIONS = [:create, :read, :update, :delete]
 
     def initialize(operation, target, mapping, params = {})
@@ -36,8 +37,11 @@ module Roaster
 
       @operation = operation
       @target = target
-      @page = params[:page] ? params[:page].to_i : 1
-      @page_size = params[:page_size] ? params[:page_size].to_i : DEFAULT_PAGE_SIZE
+      max_page_size = mapping.representable_attrs[:_max_page_size] || DEFAULT_MAX_PAGE_SIZE
+      # byebugz
+      @page_size = (params[:page] && params[:page]['size'] ? params[:page]['size'].to_i : nil) || mapping.representable_attrs[:_page_size] || DEFAULT_PAGE_SIZE
+      raise "Invalid page size" if @page_size > max_page_size
+      @page = params[:page] && params[:page]['number'] ? params[:page]['number'].to_i : 0
       @includes = includes_from_params(params, mapping)
       @fields = fields_from_params(params, mapping)
       @filters = filters_from_params(params, mapping)
@@ -46,6 +50,7 @@ module Roaster
       @mapping = mapping
     end
 
+    # TODO: REMOVE ?
     def default_page_size?
       @page_size == DEFAULT_PAGE_SIZE
     end
@@ -55,7 +60,7 @@ module Roaster
     end
 
     def sorting_as_url_params
-      sorting_values = sorting.map { |k, v| v == :asc ? k : "-#{k}" }.join(',')
+      sorting_values = sorting[@target.resource_name].map { |k, v| v == :asc ? k : "-#{k}" }.join(',')
       "sort=#{sorting_values}"
     end
 
