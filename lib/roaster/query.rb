@@ -38,7 +38,6 @@ module Roaster
       @operation = operation
       @target = target
       max_page_size = mapping.representable_attrs[:_max_page_size] || DEFAULT_MAX_PAGE_SIZE
-      # byebugz
       @page_size = (params[:page] && params[:page]['size'] ? params[:page]['size'].to_i : nil) || mapping.representable_attrs[:_page_size] || DEFAULT_PAGE_SIZE
       raise "Invalid page size" if @page_size > max_page_size
       @page = params[:page] && params[:page]['number'] ? params[:page]['number'].to_i : 0
@@ -97,7 +96,7 @@ module Roaster
     def filters_from_params(params, mapping)
       filters = {}
       mapping.filterable_attributes.each do |filter|
-        filters[filter] = params[filter] if params[filter]
+        filters[filter.to_s] = params[:filter][filter.to_s] if params[:filter][filter.to_s]
       end
       filters
     end
@@ -131,9 +130,11 @@ module Roaster
     def map_filter_ids(key,value)
       case value
       when Hash
-        value.map { |k,v| map_filter_ids(k,v) }
-      else
+        Array.map { |k,v| map_filter_ids(k,v) }
+      when Hash
          "#{key}=#{value.join(',')}"
+      else
+         "#{key}=#{value}"
       end
     end
 

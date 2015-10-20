@@ -146,7 +146,13 @@ module Roaster
           sup = {'type' => self.class.get_resource_name}
           sup.merge!({'id' => resource_id.to_s })
           attributes = super(option)
-          sup.merge!({'attributes' => attributes}) unless attributes.empty?
+          sup.merge!({
+            'attributes' => attributes.map { |attr|
+                { attr.first.to_s => attr.second.to_s }
+              }.inject { |attrs, attr|
+                attrs.merge! attr
+              }
+            }) unless attributes.empty?
           sup.merge!({'relationships' => links }) unless links.empty?
           if @root_url
             sup['links'] ||= {}
