@@ -46,13 +46,13 @@ module Roaster
         next_page = page < (pages_count - 1) ? page + 1 : nil
         {
           'data' => collection,
-          'links' => [
+          'links' => {
             'self' => serialize_page_links(self_page),
             'first' => serialize_page_links(first_page),
             'last' => serialize_page_links(last_page),
             'prev' => serialize_page_links(prev_page),
             'next' => serialize_page_links(next_page)
-          ]
+          }
         }
       end
 
