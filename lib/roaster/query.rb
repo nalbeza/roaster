@@ -95,8 +95,10 @@ module Roaster
 
     def filters_from_params(params, mapping)
       filters = {}
-      mapping.filterable_attributes.each do |filter|
-        filters[filter.to_s] = params[:filter][filter.to_s] if params[:filter][filter.to_s]
+      if params[:filter]
+        mapping.filterable_attributes.each do |filter|
+          filters[filter.to_s] = params[:filter][filter.to_s] if params[:filter][filter.to_s]
+        end
       end
       filters
     end
