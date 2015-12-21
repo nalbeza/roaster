@@ -15,6 +15,13 @@ module Roaster
         doc[get_resource_name] || doc
       end
 
+      def readonly(name, as: as)
+        property name, as: as
+        representable_attrs[:_readonly] ||= []
+        as ||= name
+        representable_attrs[:_readonly].push({as: as, name: name})
+      end
+
       def has_one(name, as: as, mapping: mapping)
       #TODO: Maybe store rels in a single hash, preventing conflicts and solving difficult access (add a type key)
         representable_attrs[:_has_one] ||= []

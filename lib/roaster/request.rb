@@ -27,15 +27,12 @@ module Roaster
       when :create
         if @query.target.relationship_name.nil?
           obj = @resource.new(@query)
-          links = @document.delete('links')
           parse(obj, @document)
           #TODO: Allow rel creation before saving (has_one requires a single update query)
           res = @resource.save(obj)
-          change_relationships(obj, links) if links
           represent(res, singular: true)
         else
           obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
-          change_relationships(obj, {@query.target.relationship_name => @document})
           nil
         end
         #TODO: Notify caller if the resource was created, or only links, useful for JSONAPI spec (HTTP 201 or 204)
@@ -52,8 +49,6 @@ module Roaster
         represent(res, singular: singular)
       when :update
         obj = @resource.find(@query.target.resource_name, @query.target.resource_ids)
-        links = @document.delete('links')
-        change_relationships(obj, links, replace: true) if links
         parse(obj, @document) unless @document.empty?
         @resource.save(obj)
         @document.empty? ? nil : represent(obj, singular: true)
@@ -87,7 +82,7 @@ module Roaster
 
     def parse(object, data)
       rp = @mapping_class.new(object)
-      rp.from_hash(data)
+      rp.from_hash(data['data'], { roaster: :resource, adapter_class: @resource.adapter.class, root_url: @root_url } )
     end
 
     def represent(data, singular: false)

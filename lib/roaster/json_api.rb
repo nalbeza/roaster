@@ -72,7 +72,37 @@ module Roaster
       end
 
       def from_hash(hash, options = {})
-        return super
+        roaster_type = options[:roaster]
+        @adapter_class = options[:adapter_class]
+        @root_url = options[:root_url]
+        has_one = {}
+        has_many = {}
+        attributes = {}
+
+        hash['relationships'].each do |relationship|
+          relationship_name = relationship.first
+          relationship_data = relationship.second
+          if relationship_data.is_a?(Array)
+            # ids = []
+            # relationship_data.each do |
+            raise "{Error: create with has_many relationship is unimplemented.}"
+          else
+            index = representable_attrs[:_has_one].find_index do |has_one_relationship|
+              has_one_relationship[:as] == relationship_name.to_sym
+            end
+            has_one[representable_attrs[:_has_one][index][:name].to_s + '_id'] = relationship_data["data"]["id"]
+          end
+        end if hash['relationships']
+
+        hash['attributes'].each do |attribute|
+          raise "{Error: '#{attribute.first}' unknown attributes" unless representable_attrs[:definitions][attribute.first]
+          attributes[attribute.first] = attribute.second
+        end if hash['attributes']
+        represented = super(attributes, options)
+        has_one.each do |has_one_relationship|
+          represented[has_one_relationship.first] = has_one_relationship.second
+        end
+        return represented
       end
 
       def linked(option, has_one, has_many)

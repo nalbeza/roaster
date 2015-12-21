@@ -43,6 +43,7 @@ module Roaster
       #TODO: #save! not good if we want to delay adapter request execution
       def save(model)
         model.save!
+        model.reload
       end
 
       #TODO: Underscore does not mean private, only `private` does
