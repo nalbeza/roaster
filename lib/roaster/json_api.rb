@@ -122,6 +122,21 @@ module Roaster
         linked
       end
 
+      def render_attribute_value(attr_value)
+        # byebug
+        if attr_value.is_a?(::Hash)
+          ::Hash[attr_value.map do |sub_value|
+            [sub_value.first.to_s, render_attribute_value(sub_value.second)]
+          end]
+        elsif attr_value.kind_of?(Array)
+          attr_value.map do |sub_value|
+            sub_value.to_s
+          end
+        else
+          attr_value.to_s
+         end
+      end
+
       #TODO: First stop when refactoring (links should be in definitions, not custom _has_one if possible)
       # Make roar's _links definition technique work in here
       def to_hash(option)
@@ -181,7 +196,7 @@ module Roaster
           attributes = super(option)
           sup.merge!({
             'attributes' => attributes.map { |attr|
-                { attr.first.to_s => attr.second.to_s }
+                { attr.first.to_s => render_attribute_value(attr.second) }
               }.inject { |attrs, attr|
                 attrs.merge! attr
               }
